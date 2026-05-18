@@ -31,11 +31,11 @@ uv run python hoge.py
 
 ## コードスタイル
 
-uv run ruff check
-uv run ruff check --fix
-uv run ruff format
-uv run ty check
-uv run taplo fmt
+uv run ruff check\
+uv run ruff check --fix\
+uv run ruff format\
+uv run ty check\
+uv run taplo fmt\
 
 ```powershell
 uv run ruff check --fix ; uv run ty check ; uv run ruff format ; uv run taplo fmt
