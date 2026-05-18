@@ -57,7 +57,7 @@ def _read_temperature_c() -> float | None:
     """取得できる場合だけ CPU 温度を返す。"""
     try:
         sensors = psutil.sensors_temperatures(fahrenheit=False) or {}  # pyright: ignore[reportAttributeAccessIssue]
-    except (AttributeError, NotImplementedError):
+    except AttributeError, NotImplementedError:
         return None
 
     values: list[float] = []
