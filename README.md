@@ -7,8 +7,10 @@
 ## 環境構築
 
 このプロジェクトは Python 3.14t を想定しています。環境構築には pip ではなく uv を使用してください。
+推奨エディターは Visual Studio Code で、Python 拡張機能をインストールして使用してください。
 
 uv: https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
+visual studio code: https://code.visualstudio.com/
 
 インストール後、以下のコマンドで依存関係をインストールしてください。
 
