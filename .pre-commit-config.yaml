@@ -10,10 +10,9 @@ repos:
     rev: v0.15.13
     hooks:
       - id: ruff
-        args: [check, --fix]
+        args: [--fix]
 
       - id: ruff-format
-        args: [format]
 
   - repo: https://github.com/executablebooks/mdformat
     rev: 1.0.0
