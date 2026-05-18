@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeAlias
 
-Scalar: TypeAlias = str | bool | int | float | tuple[int, ...]
-
 from src.benchmarks.cpu_bench import (
     DEFAULT_TASKS_PER_WORKER,
     DEFAULT_TARGET_TASK_SECONDS,
     DEFAULT_THREAD_COUNTS,
 )
+
+Scalar: TypeAlias = str | bool | int | float | tuple[int, ...]
 
 
 @dataclass(slots=True)
