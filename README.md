@@ -36,7 +36,8 @@ uv run ruff check\
 uv run ruff check --fix\
 uv run ruff format\
 uv run ty check\
-uv run taplo fmt
+uv run taplo fmt\
+uv run mdformat .
 
 ```powershell
 uv run ruff check --fix ; uv run ty check ; uv run ruff format ; uv run taplo fmt
