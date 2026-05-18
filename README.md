@@ -27,3 +27,10 @@ uv run python hoge.py
 ```
 
 その他のコマンドについては、 uv のドキュメントを参照してください。
+
+## コードスタイル
+
+uv run ruff check
+uv run ruff --fix
+uv run ruff format
+uv run ty check
