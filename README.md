@@ -18,6 +18,7 @@ visual studio code: https://code.visualstudio.com/
 
 ```bash
 uv sync
+uv run pre-commit install
 ```
 
 スクリプトの実行は以下のコマンドで行います。
