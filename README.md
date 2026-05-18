@@ -31,6 +31,6 @@ uv run python hoge.py
 ## コードスタイル
 
 uv run ruff check
-uv run ruff --fix
+uv run ruff check --fix
 uv run ruff format
 uv run ty check

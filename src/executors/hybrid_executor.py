@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from concurrent.futures import Future
 
+from src.executors.base import Executor
 from src.executors.thread_executor import ThreadExecutor
 
 
-class HybridExecutor:
+class HybridExecutor(Executor):
     """将来のハイブリッド実装の差し替え口。"""
 
     def __init__(self, max_workers: int) -> None:

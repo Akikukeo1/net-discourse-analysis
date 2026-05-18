@@ -2,8 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypeAlias, cast
 
-from src.benchmarks.cpu_bench import DEFAULT_TASKS_PER_WORKER, DEFAULT_TARGET_TASK_SECONDS, DEFAULT_THREAD_COUNTS
+Scalar: TypeAlias = str | bool | int | float | tuple[int, ...]
+
+from src.benchmarks.cpu_bench import (
+    DEFAULT_TASKS_PER_WORKER,
+    DEFAULT_TARGET_TASK_SECONDS,
+    DEFAULT_THREAD_COUNTS,
+)
 
 
 @dataclass(slots=True)
@@ -18,7 +25,7 @@ class BenchmarkSettings:
     target_task_seconds: float = DEFAULT_TARGET_TASK_SECONDS
 
 
-def _parse_scalar(raw_value: str) -> object:
+def _parse_scalar(raw_value: str) -> Scalar:
     text = raw_value.strip()
     if not text:
         return ""
@@ -36,10 +43,12 @@ def _parse_scalar(raw_value: str) -> object:
             return float(text)
         return int(text)
     except ValueError:
-        return text.strip('"\'')
+        return text.strip("\"'")
 
 
-def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> BenchmarkSettings:
+def _apply_setting(
+    settings: BenchmarkSettings, key: str, value: object
+) -> BenchmarkSettings:
     if key == "executor" and isinstance(value, str):
         settings.executor = value
     elif key == "workers" and isinstance(value, int):
@@ -47,7 +56,9 @@ def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> Benc
     elif key == "affinity" and isinstance(value, str):
         settings.affinity = value
     elif key == "thread_counts" and isinstance(value, tuple):
-        settings.thread_counts = tuple(int(item) for item in value)
+        settings.thread_counts = tuple(
+            int(item) for item in value if isinstance(item, (int, str))
+        )
     elif key == "tasks_per_worker" and isinstance(value, int):
         settings.tasks_per_worker = value
     elif key == "target_task_seconds" and isinstance(value, (int, float)):

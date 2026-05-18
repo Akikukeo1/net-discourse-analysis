@@ -32,7 +32,7 @@ def validate_cpu_info(info: CpuInfo) -> CpuInfo:
     threads = info.logical_cores or os.cpu_count() or 1
     try:
         threads = int(threads)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         threads = 1
 
     if threads <= 0:
