@@ -1,0 +1,6 @@
+executor: thread
+workers: 16
+affinity: p_core_only
+thread_counts: [1, 4, 8, 16, 28]
+tasks_per_worker: 8
+target_task_seconds: 0.05
