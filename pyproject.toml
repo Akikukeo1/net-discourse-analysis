@@ -8,7 +8,12 @@ requires-python = ">=3.14"
 dependencies = ["psutil>=7.2.2"]
 
 [dependency-groups]
-dev = ["ruff>=0.15.13", "ty>=0.0.37", "taplo>=0.9.3"]
+dev = [
+    "ruff>=0.15.13",
+    "ty>=0.0.37",
+    "taplo>=0.9.3",
+    "pre-commit>=4.6.0",
+]
 
 [tool.ruff]
 exclude = [".git", ".venv", "build", "dist"]
