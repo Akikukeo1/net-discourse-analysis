@@ -18,6 +18,12 @@ DEFAULT_THREAD_COUNTS = (1, 4, 8, 16, 28)
 DEFAULT_TASKS_PER_WORKER = 8
 DEFAULT_TARGET_TASK_SECONDS = 0.05
 
+BENCHMARK_TASK_DESCRIPTION = (
+    "CPU ワークロードは CPUWorker.run で定義され、"
+    "1 から N までの整数について平方を計算し、"
+    "結果を 1_000_000_007 で剰余する反復計算を行います。"
+)
+
 
 def generate_worker_candidates(
     logical: int | None = None, physical: int | None = None
@@ -101,7 +107,8 @@ def _percentile(values: list[float], ratio: float) -> float:
 
 def _collect_benchmark_metrics(
     executor_kind: str,
-    worker_count: int,
+    requested_thread_count: int,
+    thread_count: int,
     task_iterations: int,
     tasks_per_worker: int,
 ) -> BenchmarkResult:
@@ -114,9 +121,9 @@ def _collect_benchmark_metrics(
     started_at = time.perf_counter()
 
     task_latencies: list[float] = []
-    total_tasks = max(worker_count * tasks_per_worker, 1)
+    total_tasks = max(thread_count * tasks_per_worker, 1)
 
-    with create_executor(executor_kind, max_workers=worker_count) as executor:
+    with create_executor(executor_kind, max_workers=thread_count) as executor:
         futures: list[tuple[Future[int], float]] = []
         for _ in range(total_tasks):
             task_started_at = time.perf_counter()
@@ -153,7 +160,8 @@ def _collect_benchmark_metrics(
     )
 
     return BenchmarkResult(
-        thread_count=worker_count,
+        requested_thread_count=requested_thread_count,
+        thread_count=thread_count,
         throughput_tasks_per_second=throughput_tasks_per_second,
         average_latency_ms=average_latency_ms,
         p95_latency_ms=p95_latency_ms,
@@ -161,6 +169,11 @@ def _collect_benchmark_metrics(
         temperature_c=temperature_c,
         score=0.0,
     )
+
+
+def _log_benchmark_details(label: str, result: BenchmarkResult) -> None:
+    """ベンチマーク結果をログに出力する。"""
+    log.debug("%s: %s", label, result.format_for_log())
 
 
 def _score_results(results: list[BenchmarkResult]) -> None:
@@ -229,41 +242,78 @@ def _score_results(results: list[BenchmarkResult]) -> None:
 def benchmark(
     executor_kind: str = "thread",
     thread_counts: Iterable[int] | None = None,
+    use_thread_map: bool = False,
     tasks_per_worker: int = DEFAULT_TASKS_PER_WORKER,
     target_task_seconds: float = DEFAULT_TARGET_TASK_SECONDS,
 ) -> BenchmarkResult:
     """複数の実行ワーカー数で CPU ベンチマークを実行し、最適な値を返す。"""
     log.info("CPU ベンチマークを開始します。")
+    log.info("ベンチマークタスク: %s", BENCHMARK_TASK_DESCRIPTION)
 
-    monitor_cpu()
-    if thread_counts:
+    cpu_threads = monitor_cpu()
+    max_worker_threads = max(1, cpu_threads - 1)
+    log.info(
+        "CPU スレッド数=%s、最終的な最大利用可能ワーカー数=%s",
+        cpu_threads,
+        max_worker_threads,
+    )
+
+    if use_thread_map and thread_counts:
         candidate_thread_counts = tuple(thread_counts)
+        log.info(
+            "thread_counts が構成されたため、thread_map を使用して候補ワーカー数を上書きします。"
+        )
     else:
         candidate_thread_counts = generate_worker_candidates()
+        if thread_counts:
+            log.info(
+                "thread_counts が構成されていますが use_thread_map が false のため、"
+                "自動生成された候補ワーカー数を使用します。"
+            )
+
+    adjusted_candidate_thread_counts = tuple(
+        sorted({min(count, max_worker_threads) for count in candidate_thread_counts})
+    )
+    if adjusted_candidate_thread_counts != tuple(sorted(candidate_thread_counts)):
+        log.info(
+            "候補ワーカー数を CPU 制約で調整しました: %s -> %s",
+            candidate_thread_counts,
+            adjusted_candidate_thread_counts,
+        )
+    candidate_thread_counts = adjusted_candidate_thread_counts
+
     task_iterations = _calibrate_iterations(target_task_seconds)
 
     # 総タスク量をワーカー数に依存しないよう固定する:
     # 最大ワーカー数を基準にした総タスク数を計算し、各実行ではそれを均等分配する。
-    max_workers = max(candidate_thread_counts) if candidate_thread_counts else 1
+    max_workers = min(
+        max(candidate_thread_counts) if candidate_thread_counts else 1,
+        max_worker_threads,
+    )
     base_total_tasks = max_workers * tasks_per_worker
 
     log.info("ベンチマーク候補ワーカー数: %s", candidate_thread_counts)
     log.info("1タスクの反復回数: %s", task_iterations)
-    log.info("総タスク数（ワーカー数に依存しない）: %s", base_total_tasks)
+    log.info("ワーカー数に依存しない総タスク数: %s", base_total_tasks)
 
     results: list[BenchmarkResult] = []
     for worker_count in candidate_thread_counts:
         if worker_count <= 0:
             continue
 
+        threads_to_use = min(worker_count, max_worker_threads)
         run_tasks_per_worker = max(base_total_tasks // worker_count, 1)
         log.info(
-            "ワーカー数 %s で計測を開始します。 (tasks_per_worker=%s)",
-            worker_count,
+            "%s スレッドで計測を開始します。 (tasks_per_worker=%s)",
+            threads_to_use,
             run_tasks_per_worker,
         )
         result = _collect_benchmark_metrics(
-            executor_kind, worker_count, task_iterations, run_tasks_per_worker
+            executor_kind,
+            requested_thread_count=worker_count,
+            thread_count=threads_to_use,
+            task_iterations=task_iterations,
+            tasks_per_worker=run_tasks_per_worker,
         )
         results.append(result)
 
@@ -277,7 +327,7 @@ def benchmark(
             if result.temperature_c is not None
             else "取得不可"
         )
-        log.info(
+        log.debug(
             "ワーカー数 %s: throughput=%.2f tasks/s, latency=%.2f ms, p95=%.2f ms, power=%s, temperature=%s",
             result.thread_count,
             result.throughput_tasks_per_second,
@@ -291,15 +341,30 @@ def benchmark(
         raise ValueError("ベンチマーク対象のワーカー数がありません。")
 
     _score_results(results)
+
+    log.info("ベンチマーク候補の評価結果を出力します。")
+    for result in results:
+        _log_benchmark_details("候補結果", result)
+
     best_result = max(results, key=lambda item: item.score)
 
-    log.info(
-        "最適なワーカー数は %s です。throughput=%.2f tasks/s, latency=%.2f ms, score=%.3f",
-        best_result.thread_count,
-        best_result.throughput_tasks_per_second,
-        best_result.average_latency_ms,
-        best_result.score,
-    )
+    if best_result.requested_thread_count != best_result.thread_count:
+        log.info(
+            "最適なワーカー数は %s です。%s スレッドを使用します。throughput=%.2f tasks/s, latency=%.2f ms, score=%.3f",
+            best_result.requested_thread_count,
+            best_result.thread_count,
+            best_result.throughput_tasks_per_second,
+            best_result.average_latency_ms,
+            best_result.score,
+        )
+    else:
+        log.info(
+            "最適なワーカー数は %s です。throughput=%.2f tasks/s, latency=%.2f ms, score=%.3f",
+            best_result.thread_count,
+            best_result.throughput_tasks_per_second,
+            best_result.average_latency_ms,
+            best_result.score,
+        )
     if best_result.power_proxy is None:
         log.info(
             "電力計測はこの環境では取得できませんでした。CPU使用率ベースの代理指標も使用しませんでした。"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypeAlias, cast
+from typing import TypeAlias
 
 Scalar: TypeAlias = str | bool | int | float | tuple[int, ...]
 
@@ -23,6 +23,8 @@ class BenchmarkSettings:
     thread_counts: tuple[int, ...] = DEFAULT_THREAD_COUNTS
     tasks_per_worker: int = DEFAULT_TASKS_PER_WORKER
     target_task_seconds: float = DEFAULT_TARGET_TASK_SECONDS
+    use_thread_map: bool = False
+    log_level: str = "INFO"
 
 
 def _parse_scalar(raw_value: str) -> Scalar:
@@ -63,6 +65,10 @@ def _apply_setting(
         settings.tasks_per_worker = value
     elif key == "target_task_seconds" and isinstance(value, (int, float)):
         settings.target_task_seconds = float(value)
+    elif key == "use_thread_map" and isinstance(value, bool):
+        settings.use_thread_map = value
+    elif key == "log_level" and isinstance(value, str):
+        settings.log_level = value.strip().upper()
     return settings
 
 
