@@ -9,3 +9,8 @@ dependencies = [
     "psutil>=7.2.2",
     "ruff>=0.15.13",
 ]
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.37",
+]
