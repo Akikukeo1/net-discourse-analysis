@@ -16,6 +16,7 @@ dev = [
   "mdformat-gfm>=1.0.0",
   "mdformat-frontmatter>=2.0.10",
   "mdformat-tables>=1.0.0",
+  "youtube-comment-downloader>=0.1.78",
 ]
 
 [tool.ruff]
