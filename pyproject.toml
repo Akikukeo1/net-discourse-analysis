@@ -23,6 +23,7 @@ exclude = [".git", ".venv", "build", "dist"]
 line-length = 88
 indent-width = 4
 target-version = "py313"
+# NOTE: Ruff は 314 に対応するが、新構文にエコシステムが追いついていないため、313 を指定する。将来的に 314 に変更する。
 
 [tool.ruff.lint]
 select = ["PGH003", "E4", "E7", "E9", "F"]
