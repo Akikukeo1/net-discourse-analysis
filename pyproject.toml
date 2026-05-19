@@ -20,25 +20,46 @@ dev = [
 
 [tool.ruff]
 exclude = [".git", ".venv", "build", "dist"]
-line-length = 88
+line-length = 120
 indent-width = 4
 target-version = "py313"
 # NOTE: Ruff は 314 に対応するが、新構文にエコシステムが追いついていないため、313 を指定する。将来的に 314 に変更する。
+preview = true # プレビュー機能を利用したいため、有効にする。
 
 [tool.ruff.lint]
+mccabe = { max-complexity = 15 }
 select = [
-  "PGH003",
-  "E4",
-  "E7",
-  "E9",
-  "F",
-  "TID252",
   "B",
+  "D",
+  "E",
+  "F",
   "I",
+  "N",
+  "W",
+  "T20",
+  "C90",
+  "TID252",
+  "PGH003",
   "UP",
   "SIM",
   "RUF",
+  "PIE",
+  "PTH",
+  "RET",
+  "DTZ",
+  "ARG",
+  "ASYNC",
+  "NPY",
+  "PT",
 ]
+ignore = ["D100", "D102", "D400", "D415"]
+per-file-ignores = { "scripts/*.py" = [
+  "D",
+  "T201",
+], "src/executors/*.py" = [
+  "D",
+] }
+
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"

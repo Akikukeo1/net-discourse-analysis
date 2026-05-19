@@ -1,6 +1,10 @@
 # net-discourse-analysis
 
+<!-- NOTE: もし、論文を公開する場合は変更する。 -->
+
 このリポジトリは、研究プロジェクトのコードを管理するためのものです。
+現在、コードは開発段階にあります。コードの安定性やドキュメントの充実度はまだ十分ではありません。
+論文は現在一般公開予定ではありませんが、コードはオープンソースで公開しています。コードの使用や貢献は歓迎しますが、安定性やドキュメントの不足に留意してください。
 
 詳細なデータ取り扱い・制限事項については `DATA_POLICY.md` を参照してください。
 このリポジトリへの貢献方法については `CONTRIBUTING.md` を参照してください。
@@ -11,9 +15,9 @@
 このプロジェクトは Python 3.14t を想定しています。環境構築には pip ではなく uv を使用してください。
 
 > [!NOTE]
-> Free Threading については、試験的に導入しています。恐らくは Free Threading なしの環境でも動作するはずですが、動作確認はしていません。
+> Free Threading については、試験的に導入しています。恐らくは Free Threading なしの環境でもコードを一部変更すれば動作するはずですが、動作確認はしていません。
 
-推奨エディターは Visual Studio Code で、Python 拡張機能をインストールして使用してください。
+推奨エディターは Visual Studio Code です。
 
 - uv: https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
 - visual studio code: https://code.visualstudio.com/
@@ -34,7 +38,7 @@ uv run pre-commit install
 uv run python hoge.py
 ```
 
-その他のコマンドについては、 uv のドキュメントを参照してください。
+詳しくは、uv のドキュメントを参照してください。
 
 ## コードスタイル
 

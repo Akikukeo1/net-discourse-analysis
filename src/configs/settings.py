@@ -24,12 +24,10 @@ class BenchmarkSettings:
     tasks_per_worker: int = DEFAULT_TASKS_PER_WORKER
     target_task_seconds: float = DEFAULT_TARGET_TASK_SECONDS
     use_thread_map: bool = False
-    log_level: str = "INFO"
+    log_level: str = "DEBUG"  # 開発中は DEBUG が良さそう。
 
 
-def _apply_setting(
-    settings: BenchmarkSettings, key: str, value: object
-) -> BenchmarkSettings:
+def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> BenchmarkSettings:
     if key == "executor" and isinstance(value, str):
         settings.executor = value
     elif key == "workers" and isinstance(value, int):

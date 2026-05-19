@@ -25,9 +25,7 @@ BENCHMARK_TASK_DESCRIPTION = (
 )
 
 
-def generate_worker_candidates(
-    logical: int | None = None, physical: int | None = None
-) -> tuple[int, ...]:
+def generate_worker_candidates(logical: int | None = None, physical: int | None = None) -> tuple[int, ...]:
     """CPU に依存せずに候補ワーカー数を自動生成する。
 
     戦略:
@@ -143,9 +141,7 @@ def _collect_benchmark_metrics(
     include_children_cpu_times = executor_kind == "process"
 
     start_cpu_times = process.cpu_times()
-    start_cpu_time_total = _cpu_time_total_seconds(
-        start_cpu_times, include_children=include_children_cpu_times
-    )
+    start_cpu_time_total = _cpu_time_total_seconds(start_cpu_times, include_children=include_children_cpu_times)
     start_temperature = _read_temperature_c()
     started_at = time.perf_counter()
 
@@ -166,9 +162,7 @@ def _collect_benchmark_metrics(
 
     elapsed = time.perf_counter() - started_at
     end_cpu_times = process.cpu_times()
-    end_cpu_time_total = _cpu_time_total_seconds(
-        end_cpu_times, include_children=include_children_cpu_times
-    )
+    end_cpu_time_total = _cpu_time_total_seconds(end_cpu_times, include_children=include_children_cpu_times)
     end_temperature = _read_temperature_c()
 
     cpu_time_seconds = None
@@ -179,18 +173,12 @@ def _collect_benchmark_metrics(
     if elapsed > 0 and cpu_time_seconds is not None:
         power_proxy = (cpu_time_seconds / elapsed) * 100.0 / max(logical_cpu_count, 1)
 
-    temperatures = [
-        value for value in (start_temperature, end_temperature) if value is not None
-    ]
+    temperatures = [value for value in (start_temperature, end_temperature) if value is not None]
     temperature_c = max(temperatures) if temperatures else None
 
     throughput_tasks_per_second = total_tasks / elapsed if elapsed > 0 else 0.0
-    average_latency_ms = (
-        statistics.fmean(task_latencies) * 1000.0 if task_latencies else 0.0
-    )
-    p95_latency_ms = (
-        _percentile(task_latencies, 0.95) * 1000.0 if task_latencies else 0.0
-    )
+    average_latency_ms = statistics.fmean(task_latencies) * 1000.0 if task_latencies else 0.0
+    p95_latency_ms = _percentile(task_latencies, 0.95) * 1000.0 if task_latencies else 0.0
 
     return BenchmarkResult(
         requested_thread_count=requested_thread_count,
@@ -214,23 +202,15 @@ def _score_results(results: list[BenchmarkResult]) -> None:
     if not results:
         return
 
-    max_throughput = (
-        max(result.throughput_tasks_per_second for result in results) or 1.0
-    )
-    positive_latencies = [
-        result.average_latency_ms for result in results if result.average_latency_ms > 0
-    ]
+    max_throughput = max(result.throughput_tasks_per_second for result in results) or 1.0
+    positive_latencies = [result.average_latency_ms for result in results if result.average_latency_ms > 0]
     min_latency = min(positive_latencies) if positive_latencies else 1.0
 
     power_values = [
-        result.power_proxy
-        for result in results
-        if result.power_proxy is not None and result.power_proxy > 0
+        result.power_proxy for result in results if result.power_proxy is not None and result.power_proxy > 0
     ]
     temperature_values = [
-        result.temperature_c
-        for result in results
-        if result.temperature_c is not None and result.temperature_c > 0
+        result.temperature_c for result in results if result.temperature_c is not None and result.temperature_c > 0
     ]
 
     min_power = min(power_values) if power_values else None
@@ -239,28 +219,18 @@ def _score_results(results: list[BenchmarkResult]) -> None:
     for result in results:
         factors: list[tuple[float, float]] = []
 
-        throughput_score = max(
-            result.throughput_tasks_per_second / max_throughput, 1e-9
-        )
+        throughput_score = max(result.throughput_tasks_per_second / max_throughput, 1e-9)
         factors.append((throughput_score, 0.5))
 
         if result.average_latency_ms > 0:
             latency_score = max(min_latency / result.average_latency_ms, 1e-9)
             factors.append((latency_score, 0.3))
 
-        if (
-            min_power is not None
-            and result.power_proxy is not None
-            and result.power_proxy > 0
-        ):
+        if min_power is not None and result.power_proxy is not None and result.power_proxy > 0:
             power_score = max(min_power / result.power_proxy, 1e-9)
             factors.append((power_score, 0.2))
 
-        if (
-            min_temperature is not None
-            and result.temperature_c is not None
-            and result.temperature_c > 0
-        ):
+        if min_temperature is not None and result.temperature_c is not None and result.temperature_c > 0:
             temperature_score = max(min_temperature / result.temperature_c, 1e-9)
             factors.append((temperature_score, 0.1))
 
@@ -293,9 +263,7 @@ def benchmark(
 
     if use_thread_map and thread_counts:
         candidate_thread_counts = tuple(thread_counts)
-        log.info(
-            "thread_counts が構成されたため、thread_map を使用して候補ワーカー数を上書きします。"
-        )
+        log.info("thread_counts が構成されたため、thread_map を使用して候補ワーカー数を上書きします。")
     else:
         candidate_thread_counts = generate_worker_candidates()
         if thread_counts:
@@ -350,16 +318,8 @@ def benchmark(
         )
         results.append(result)
 
-        power_text = (
-            f"{result.power_proxy:.2f}%"
-            if result.power_proxy is not None
-            else "取得不可"
-        )
-        temperature_text = (
-            f"{result.temperature_c:.2f}C"
-            if result.temperature_c is not None
-            else "取得不可"
-        )
+        power_text = f"{result.power_proxy:.2f}%" if result.power_proxy is not None else "取得不可"
+        temperature_text = f"{result.temperature_c:.2f}C" if result.temperature_c is not None else "取得不可"
         log.debug(
             "ワーカー数 %s: throughput=%.2f tasks/s, latency=%.2f ms, p95=%.2f ms, power=%s, temperature=%s",
             result.thread_count,
@@ -399,9 +359,7 @@ def benchmark(
             best_result.score,
         )
     if best_result.power_proxy is None:
-        log.info(
-            "電力計測はこの環境では取得できませんでした。CPU使用率ベースの代理指標も使用しませんでした。"
-        )
+        log.info("電力計測はこの環境では取得できませんでした。CPU使用率ベースの代理指標も使用しませんでした。")
     if best_result.temperature_c is None:
         log.info("温度計測はこの環境では取得できませんでした。")
 
