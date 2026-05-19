@@ -19,6 +19,7 @@
 インストール後、以下のコマンドで依存関係をインストールしてください。
 
 ```bash
+uv venv
 uv sync
 uv run pre-commit install
 ```
