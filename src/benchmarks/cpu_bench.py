@@ -106,7 +106,7 @@ def _percentile(values: list[float], ratio: float) -> float:
         return 0.0
 
     ordered = sorted(values)
-    index = min(int(round((len(ordered) - 1) * ratio)), len(ordered) - 1)
+    index = min(round((len(ordered) - 1) * ratio), len(ordered) - 1)
     return ordered[index]
 
 

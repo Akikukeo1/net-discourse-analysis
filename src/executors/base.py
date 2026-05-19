@@ -17,6 +17,7 @@ class Executor(ABC):
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.close()
 
+    @abstractmethod
     def close(self) -> None:
         """必要なら後始末する。"""
 
