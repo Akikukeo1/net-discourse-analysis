@@ -1,0 +1,36 @@
+ci:
+  autofix_prs: true
+
+repos:
+  # TODO: `taplo` の検証・整形は pre-commit のデフォルト環境では
+  # 実行できないケースがあります（pre-commit.ci 等では system 実行が制限されるため）。
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.13
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+
+  # ローカル環境向け: taplo は system 実行が必要なため pre-commit.ci 等では動作しない可能性があります。
+  # CI 側で必ず実行するようにワークフローにも追加しています。
+  - repo: local
+    hooks:
+      - id: taplo-format
+        name: "taplo format"
+        entry: python scripts/run_taplo.py
+        language: python
+        additional_dependencies:
+          - taplo>=0.9.3
+        files: \.toml$
+        # TODO: ローカル環境専用フックです。pre-commit.ci 等の環境では system 実行が制限されるため動作しない可能性があります。
