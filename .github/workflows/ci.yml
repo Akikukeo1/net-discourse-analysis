@@ -4,20 +4,17 @@ on: [push, pull_request]
 jobs:
   ci:
     runs-on: ubuntu-latest
-    name: CI / ${{ matrix.task }} (${{ matrix.python }})
+    env:
+      PYTHON_VERSION: '3.13'
+    name: CI / ${{ matrix.task }} (${{ env.PYTHON_VERSION }})
     strategy:
       matrix:
         include:
           - task: ruff-check
-            python: '3.13'
           - task: pytest
-            python: '3.13'
           - task: import-check
-            python: '3.13'
           - task: ty-check
-            python: '3.13'
           - task: taplo
-            python: '3.13'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +22,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
@@ -45,7 +42,7 @@ jobs:
 
       - name: "ruff-check: Ruff check"
         if: matrix.task == 'ruff-check'
-        run: ruff check .
+        run: uv run ruff check .
 
       # `ruff format` は pre-commit の自動修正に委譲しているため CI 側のフォーマットチェックは省略しています.
 
@@ -57,19 +54,20 @@ jobs:
         if: matrix.task == 'pytest'
         run: |
           # テストが存在しない場合は早期終了
-          tests_count=$(pytest --collect-only -q | wc -l || true)
+          tests_count=$(uv run pytest --collect-only -q | wc -l || true)
           if [ "$tests_count" -eq 0 ]; then
             echo "No tests found, skipping pytest"
             exit 0
           fi
-          pytest -q
+          uv run pytest -q
 
       - name: "import-check: Import check"
         if: matrix.task == 'import-check'
-        run: python -c "import importlib, pkgutil; importlib.import_module('src')"
+        run: |
+          uv run python -c 'import importlib, pkgutil; importlib.import_module("src")'
 
       - name: "taplo: Taplo format check"
         if: matrix.task == 'taplo'
         run: |
           # .toml ファイルをフォーマットチェック
-          find . -name '*.toml' -print0 | xargs -0 -r taplo format --check
+          find . -name '*.toml' -print0 | xargs -0 -r -n1 sh -c 'uv run taplo format --check "$0"'
