@@ -24,7 +24,7 @@ line-length = 120
 indent-width = 4
 target-version = "py313"
 # NOTE: Ruff は 314 に対応するが、新構文にエコシステムが追いついていないため、313 を指定する。将来的に 314 に変更する。
-preview = true
+preview = true # プレビュー機能を利用したいため、有効にする。
 
 [tool.ruff.lint]
 mccabe = { max-complexity = 15 }
@@ -58,7 +58,6 @@ per-file-ignores = { "scripts/*.py" = [
   "T201",
 ], "src/executors/*.py" = [
   "D",
-  "T201",
 ] }
 
 
