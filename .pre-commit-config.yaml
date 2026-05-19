@@ -23,10 +23,6 @@ repos:
     hooks:
       - id: ty-check
         name: ty type check
-        entry: ty
-        args: [check]
-        language: python
-        additional_dependencies:
-          - ty>=0.0.37
-          - psutil>=7.2.2
+        entry: uv run ty check
+        language: system
         pass_filenames: false

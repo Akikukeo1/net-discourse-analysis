@@ -5,7 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 
-dependencies = ["psutil>=7.2.2"]
+dependencies = [
+    "psutil>=7.2.2",
+    "pyyaml>=6.0.3",
+]
 
 [dependency-groups]
 dev = [
