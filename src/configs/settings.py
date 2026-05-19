@@ -24,7 +24,7 @@ class BenchmarkSettings:
     tasks_per_worker: int = DEFAULT_TASKS_PER_WORKER
     target_task_seconds: float = DEFAULT_TARGET_TASK_SECONDS
     use_thread_map: bool = False
-    log_level: str = "INFO"
+    log_level: str = "DEBUG"
 
 
 def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> BenchmarkSettings:
