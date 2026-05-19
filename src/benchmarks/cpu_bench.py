@@ -110,6 +110,25 @@ def _percentile(values: list[float], ratio: float) -> float:
     return ordered[index]
 
 
+def _cpu_time_total_seconds(cpu_times: object, include_children: bool) -> float | None:
+    """cpu_times から合計CPU時間を秒で返す。取得できない場合は None。"""
+    user_time = getattr(cpu_times, "user", None)
+    system_time = getattr(cpu_times, "system", None)
+    if user_time is None or system_time is None:
+        return None
+
+    total = float(user_time) + float(system_time)
+    if not include_children:
+        return total
+
+    children_user = getattr(cpu_times, "children_user", None)
+    children_system = getattr(cpu_times, "children_system", None)
+    if children_user is None or children_system is None:
+        return None
+
+    return total + float(children_user) + float(children_system)
+
+
 def _collect_benchmark_metrics(
     executor_kind: str,
     requested_thread_count: int,
@@ -121,7 +140,12 @@ def _collect_benchmark_metrics(
     process = psutil.Process()
     logical_cpu_count = psutil.cpu_count(logical=True) or os.cpu_count() or 1
 
+    include_children_cpu_times = executor_kind == "process"
+
     start_cpu_times = process.cpu_times()
+    start_cpu_time_total = _cpu_time_total_seconds(
+        start_cpu_times, include_children=include_children_cpu_times
+    )
     start_temperature = _read_temperature_c()
     started_at = time.perf_counter()
 
@@ -142,13 +166,17 @@ def _collect_benchmark_metrics(
 
     elapsed = time.perf_counter() - started_at
     end_cpu_times = process.cpu_times()
+    end_cpu_time_total = _cpu_time_total_seconds(
+        end_cpu_times, include_children=include_children_cpu_times
+    )
     end_temperature = _read_temperature_c()
 
-    cpu_time_seconds = (end_cpu_times.user + end_cpu_times.system) - (
-        start_cpu_times.user + start_cpu_times.system
-    )
+    cpu_time_seconds = None
+    if start_cpu_time_total is not None and end_cpu_time_total is not None:
+        cpu_time_seconds = end_cpu_time_total - start_cpu_time_total
+
     power_proxy = None
-    if elapsed > 0:
+    if elapsed > 0 and cpu_time_seconds is not None:
         power_proxy = (cpu_time_seconds / elapsed) * 100.0 / max(logical_cpu_count, 1)
 
     temperatures = [
