@@ -1,5 +1,16 @@
 {
     "recommendations": [
-        "charliermarsh.ruff"
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml",
+        "wholroyd.jinja",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.vscode-python-envs",
+        "donjayamanne.python-extension-pack",
+        "donjayamanne.python-environment-manager",
+        "kevinrose.vsc-python-indent",
+        "gruntfuggly.todo-tree",
+        "redhat.vscode-yaml"
     ]
 }
