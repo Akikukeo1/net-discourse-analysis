@@ -4,8 +4,8 @@ import logging as log
 import os
 import statistics
 import time
+from collections.abc import Iterable
 from concurrent.futures import Future
-from typing import Iterable
 
 import psutil
 

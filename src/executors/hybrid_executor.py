@@ -15,7 +15,7 @@ class HybridExecutor(Executor):
     def submit(self, worker) -> Future:
         return self._delegate.submit(worker)
 
-    def __enter__(self) -> "HybridExecutor":
+    def __enter__(self) -> HybridExecutor:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:

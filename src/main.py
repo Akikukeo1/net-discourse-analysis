@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import logging as log
+from pathlib import Path
 
 from src.benchmarks.cpu_bench import benchmark
 from src.configs.settings import load_benchmark_settings

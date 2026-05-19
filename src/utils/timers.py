@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from time import perf_counter
-from typing import Iterator
 
 
 @contextmanager

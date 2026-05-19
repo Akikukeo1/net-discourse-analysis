@@ -11,7 +11,7 @@ class Executor(ABC):
     def submit(self, worker) -> Future:
         """worker の run を実行キューに入れる。"""
 
-    def __enter__(self) -> "Executor":
+    def __enter__(self) -> Executor:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
