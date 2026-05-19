@@ -12,14 +12,20 @@ def main() -> int:
 
     taplo_path = shutil.which("taplo")
     if taplo_path is None:
-        print("taplo が見つかりません。pre-commit の依存関係を確認してください。", file=sys.stderr)
+        print(
+            "taplo が見つかりません。pre-commit の依存関係を確認してください。",
+            file=sys.stderr,
+        )
         return 1
 
-    result = subprocess.run([
-        taplo_path,
-        "format",
-        *files,
-    ], check=False)
+    result = subprocess.run(
+        [
+            taplo_path,
+            "format",
+            *files,
+        ],
+        check=False,
+    )
     return result.returncode
 
 

@@ -9,7 +9,7 @@ class Executor(ABC):
 
     @abstractmethod
     def submit(self, worker) -> Future:
-        """worker の run を実行キューに入れる。"""
+        """Worker の run を実行キューに入れる。"""
 
     def __enter__(self) -> Executor:
         return self

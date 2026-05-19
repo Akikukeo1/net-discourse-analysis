@@ -15,7 +15,10 @@ def main() -> None:
     settings = load_benchmark_settings(CONFIG_PATH)
     configure_logging(settings.log_level)
     log.info(
-        "ベンチマーク設定: executor=%s, thread_counts=%s, use_thread_map=%s, tasks_per_worker=%s, target_task_seconds=%s",
+        (
+            "ベンチマーク設定: executor=%s, thread_counts=%s, "
+            "use_thread_map=%s, tasks_per_worker=%s, target_task_seconds=%s"
+        ),
         settings.executor,
         settings.thread_counts,
         settings.use_thread_map,

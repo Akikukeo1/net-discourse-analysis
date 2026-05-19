@@ -27,9 +27,7 @@ class BenchmarkSettings:
     log_level: str = "INFO"
 
 
-def _apply_setting(
-    settings: BenchmarkSettings, key: str, value: object
-) -> BenchmarkSettings:
+def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> BenchmarkSettings:
     if key == "executor" and isinstance(value, str):
         settings.executor = value
     elif key == "workers" and isinstance(value, int):

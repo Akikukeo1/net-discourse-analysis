@@ -17,18 +17,10 @@ class BenchmarkResult:
     score: float
 
     def format_for_log(self) -> str:
-        power_text = (
-            f"{self.power_proxy:.2f}%" if self.power_proxy is not None else "取得不可"
-        )
-        temperature_text = (
-            f"{self.temperature_c:.2f}C"
-            if self.temperature_c is not None
-            else "取得不可"
-        )
+        power_text = f"{self.power_proxy:.2f}%" if self.power_proxy is not None else "取得不可"
+        temperature_text = f"{self.temperature_c:.2f}C" if self.temperature_c is not None else "取得不可"
         requested_text = (
-            f"requested={self.requested_thread_count}, "
-            if self.requested_thread_count != self.thread_count
-            else ""
+            f"requested={self.requested_thread_count}, " if self.requested_thread_count != self.thread_count else ""
         )
         thread_text = f"thread_count={self.thread_count}"
         return (
