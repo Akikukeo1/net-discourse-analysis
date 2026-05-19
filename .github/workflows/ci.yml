@@ -4,9 +4,7 @@ on: [push, pull_request]
 jobs:
   ci:
     runs-on: ubuntu-latest
-    env:
-      PYTHON_VERSION: '3.13'
-    name: CI / ${{ matrix.task }} (${{ env.PYTHON_VERSION }})
+    name: CI / ${{ matrix.task }}
     strategy:
       matrix:
         include:
@@ -22,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.13'
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
