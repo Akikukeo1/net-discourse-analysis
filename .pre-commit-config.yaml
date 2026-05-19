@@ -18,11 +18,3 @@ repos:
     rev: 1.0.0
     hooks:
       - id: mdformat
-
-  - repo: local
-    hooks:
-      - id: ty-check
-        name: ty type check
-        entry: uv run ty check
-        language: system
-        pass_filenames: false

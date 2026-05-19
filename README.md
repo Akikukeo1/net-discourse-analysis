@@ -24,6 +24,8 @@ uv sync
 uv run pre-commit install
 ```
 
+`ty check` は GitHub Actions で実行します。
+
 スクリプトの実行は以下のコマンドで行います。
 
 ```bash
