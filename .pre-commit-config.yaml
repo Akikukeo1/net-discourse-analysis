@@ -1,3 +1,6 @@
+ci:
+  autofix_prs: true
+
 repos:
   # TODO: `taplo` の検証・整形は pre-commit のデフォルト環境では
   # 実行できないケースがあります（pre-commit.ci 等では system 実行が制限されるため）。
@@ -24,8 +27,10 @@ repos:
   - repo: local
     hooks:
       - id: taplo-format
-        name: "taplo: format (check)"
-        entry: taplo format --check
-        language: system
+        name: "taplo format"
+        entry: python scripts/run_taplo.py
+        language: python
+        additional_dependencies:
+          - taplo>=0.9.3
         files: \.toml$
         # TODO: ローカル環境専用フックです。pre-commit.ci 等の環境では system 実行が制限されるため動作しない可能性があります。
