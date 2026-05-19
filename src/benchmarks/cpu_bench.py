@@ -56,8 +56,13 @@ def generate_worker_candidates(
 def _read_temperature_c() -> float | None:
     """取得できる場合だけ CPU 温度を返す。"""
     try:
-        sensors = psutil.sensors_temperatures(fahrenheit=False) or {}  # pyright: ignore[reportAttributeAccessIssue]
-    except AttributeError, NotImplementedError:
+        sensors_temperatures = getattr(psutil, "sensors_temperatures", None)
+
+        if sensors_temperatures is None:
+            return None
+
+        sensors = sensors_temperatures(fahrenheit=False) or {}
+    except NotImplementedError:
         return None
 
     values: list[float] = []
