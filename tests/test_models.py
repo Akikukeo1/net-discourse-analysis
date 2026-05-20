@@ -25,7 +25,7 @@ def test_annotation_requires_experiment_id() -> None:
     """experiment_id が無い場合に ValidationError を発生させることを検証する。"""
     cid = uuid4()
     with pytest.raises(ValidationError):
-        # missing experiment_id should raise — model_validate を使って静的解析エラーを回避
+        # HACK: 静的解析エラーを回避するため model_validate を使用
         Annotation.model_validate({"comment_id": cid, "method": "llm"})
 
 
