@@ -26,14 +26,14 @@ def create_executor(kind: str, max_workers: int) -> Executor:
     """実行方式を設定で切り替える。"""
     normalized_kind = kind.strip().lower()
     if normalized_kind == "process":
-        from src.executors.process_executor import ProcessExecutor
+        from nda.executors.process_executor import ProcessExecutor
 
         return ProcessExecutor(max_workers=max_workers)
     if normalized_kind == "hybrid":
-        from src.executors.hybrid_executor import HybridExecutor
+        from nda.executors.hybrid_executor import HybridExecutor
 
         return HybridExecutor(max_workers=max_workers)
 
-    from src.executors.thread_executor import ThreadExecutor
+    from nda.executors.thread_executor import ThreadExecutor
 
     return ThreadExecutor(max_workers=max_workers)

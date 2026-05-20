@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import Future, ThreadPoolExecutor
 
-from src.executors.base import Executor
+from nda.executors.base import Executor
 
 
 class ThreadExecutor(Executor):

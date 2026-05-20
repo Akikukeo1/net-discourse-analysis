@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from concurrent.futures import Future
 
-from src.executors.base import Executor
-from src.executors.thread_executor import ThreadExecutor
+from nda.executors.base import Executor
+from nda.executors.thread_executor import ThreadExecutor
 
 
 class HybridExecutor(Executor):

@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 
-dependencies = ["psutil>=7.2.2", "pyyaml>=6.0.3"]
+dependencies = ["psutil>=7.2.2", "pydantic>=2.13.4", "pyyaml>=6.0.3"]
 
 [dependency-groups]
 dev = [
@@ -16,7 +16,12 @@ dev = [
   "mdformat-gfm>=1.0.0",
   "mdformat-frontmatter>=2.0.10",
   "mdformat-tables>=1.0.0",
+  "youtube-comment-downloader>=0.1.78",
+  "pytest>=9.0.3",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 
 [tool.ruff]
 exclude = [".git", ".venv", "build", "dist"]
@@ -56,7 +61,7 @@ ignore = ["D100", "D102", "D400", "D415"]
 per-file-ignores = { "scripts/*.py" = [
   "D",
   "T201",
-], "src/executors/*.py" = [
+], "src/nda/executors/*.py" = [
   "D",
 ] }
 
