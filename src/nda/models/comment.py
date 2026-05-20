@@ -15,7 +15,7 @@ class Comment(BaseModel):
         platform: プラットフォーム名(例: "youtube")。
         text: コメント本文。
         created_at: 作成日時(任意)。
-        classification_label: 分類ラベル(任意)。
+        classification_label: 任意の分類ラベル。
 
     """
 
