@@ -9,10 +9,10 @@ from concurrent.futures import Future
 
 import psutil
 
-from src.executors import create_executor
-from src.hardware.cpu_info import monitor_cpu
-from src.monitoring.metrics import BenchmarkResult
-from src.workers.cpu_worker import CPUWorker
+from nda.executors.base import create_executor
+from nda.hardware.cpu_info import monitor_cpu
+from nda.monitoring.metrics import BenchmarkResult
+from nda.workers.cpu_worker import CPUWorker
 
 DEFAULT_THREAD_COUNTS = (1, 4, 8, 16, 28)
 DEFAULT_TASKS_PER_WORKER = 8

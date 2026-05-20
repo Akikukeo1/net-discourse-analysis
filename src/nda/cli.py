@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging as log
 from pathlib import Path
 
-from src.benchmarks.cpu_bench import benchmark
-from src.configs.settings import load_benchmark_settings
-from src.monitoring.logging_config import configure_logging
+from nda.benchmarks.cpu_bench import benchmark
+from nda.configs.settings import load_benchmark_settings
+from nda.monitoring.logging_config import configure_logging
 
 CONFIG_PATH = Path(__file__).resolve().parent / "configs" / "hardware.yaml"
 

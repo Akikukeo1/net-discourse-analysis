@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from src.benchmarks.cpu_bench import (
+from nda.benchmarks.cpu_bench import (
     DEFAULT_TARGET_TASK_SECONDS,
     DEFAULT_TASKS_PER_WORKER,
     DEFAULT_THREAD_COUNTS,
