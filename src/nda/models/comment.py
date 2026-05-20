@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Comment(BaseModel):
@@ -75,7 +75,4 @@ class Annotation(BaseModel):
     confidence: float | None = None
     created_at: datetime | None = None
 
-    class Config:
-        """Pydantic の設定: 未知のフィールドを禁止する。"""
-
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
