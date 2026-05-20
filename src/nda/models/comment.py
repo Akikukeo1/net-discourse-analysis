@@ -76,7 +76,7 @@ class Annotation(BaseModel):
     method: str
     model: str | None = None
     version: str | None = None
-    confidence: float | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
     created_at: datetime | None = None
 
     model_config = ConfigDict(extra="forbid")
