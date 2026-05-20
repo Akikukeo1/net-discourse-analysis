@@ -25,6 +25,8 @@ class Comment(BaseModel):
     created_at: datetime | None = None
     classification_label: str | None = None
 
+    model_config = ConfigDict(extra="forbid")
+
 
 class CommentMeta(BaseModel):
     """コメントに紐づくメタ情報。
