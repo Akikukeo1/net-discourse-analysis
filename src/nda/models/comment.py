@@ -50,6 +50,8 @@ class CommentMeta(BaseModel):
     author_id: str | None = None
     extra: dict[str, Any] = Field(default_factory=dict)
 
+    model_config = ConfigDict(extra="forbid")
+
 
 class Annotation(BaseModel):
     """コメントに対するアノテーション情報。
