@@ -41,9 +41,9 @@ class CommentMeta(BaseModel):
     """
 
     comment_id: UUID
-    likes: int | None = None
-    reposts: int | None = None
-    replies: int | None = None
+    likes: int | None = Field(default=None, ge=0)
+    reposts: int | None = Field(default=None, ge=0)
+    replies: int | None = Field(default=None, ge=0)
     video_id: str | None = None
     author_id: str | None = None
     extra: dict[str, Any] = Field(default_factory=dict)
