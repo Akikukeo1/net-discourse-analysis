@@ -1,1 +1,1 @@
-"""Models package for net-discourse-analysis."""
+"""net-discourse-analysis のモデルパッケージ。"""
