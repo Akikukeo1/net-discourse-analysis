@@ -40,7 +40,7 @@ uv run python hoge.py
 
 詳しくは、uv のドキュメントを参照してください。
 
-## コードスタイル
+## コードスタイル・テスト
 
 uv run ruff check\
 uv run ruff check --fix\
@@ -49,6 +49,8 @@ uv run ty check\
 uv run taplo fmt\
 uv run mdformat .
 
+uv run pytest tests/
+
 ```powershell
-uv run ruff check --fix ; uv run ty check ; uv run ruff format ; uv run taplo fmt ; uv run mdformat .
+uv run ruff check --fix ; uv run ty check ; uv run ruff format ; uv run taplo fmt ; uv run mdformat . ; uv run pytest tests/
 ```
