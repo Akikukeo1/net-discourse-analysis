@@ -3,7 +3,7 @@ import pathlib
 import sys
 from typing import cast
 
-from nda.normalization.normalizer import CONTROL_PATTERN, URL_PATTERN, ZERO_WIDTH
+from nda.normalization.normalizer import URL_PATTERN, ZERO_WIDTH
 
 DEFAULT_INPUT_PATH = pathlib.Path(__file__).resolve().parent / "data" / "samples" / "safe_normalized_samples.jsonl"
 
