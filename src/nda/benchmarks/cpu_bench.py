@@ -14,7 +14,16 @@ from nda.hardware.cpu_info import monitor_cpu
 from nda.monitoring.metrics import BenchmarkResult
 from nda.workers.cpu_worker import CPUWorker
 
-DEFAULT_THREAD_COUNTS = (1, 4, 8, 16, 28)
+DEFAULT_THREAD_COUNTS = (
+    1,
+    2,
+    4,
+    8,
+    16,
+    28,
+    32,
+    64,
+)
 DEFAULT_TASKS_PER_WORKER = 8
 DEFAULT_TARGET_TASK_SECONDS = 0.05
 

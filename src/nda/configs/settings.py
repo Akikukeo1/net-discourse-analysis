@@ -25,6 +25,7 @@ class BenchmarkSettings:
     target_task_seconds: float = DEFAULT_TARGET_TASK_SECONDS
     use_thread_map: bool = False
     log_level: str = "DEBUG"  # 開発中は DEBUG が良さそう。
+    benchmark_run: bool = False  # NOTE: ベンチマークが既に実行されたかどうかを示すフラグ
 
 
 def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> BenchmarkSettings:
@@ -53,6 +54,9 @@ def _apply_setting(settings: BenchmarkSettings, key: str, value: object) -> Benc
         settings.use_thread_map = value
     elif key == "log_level" and isinstance(value, str):
         settings.log_level = value.strip().upper()
+    elif key == "benchmark_run" and isinstance(value, bool):
+        # NOTE: YAMLから読み込んだベンチマーク実行済みフラグを設定します
+        settings.benchmark_run = value
     return settings
 
 
@@ -74,3 +78,38 @@ def load_benchmark_settings(path: Path) -> BenchmarkSettings:
             settings = _apply_setting(settings, key.strip(), value)
 
     return settings
+
+
+def load_benchmark_cache(path: Path, settings: BenchmarkSettings) -> BenchmarkSettings:
+    """キャッシュファイルからベンチマーク結果を読み込み、設定に適用する。"""
+    if not path.exists():
+        return settings
+
+    try:
+        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if loaded and isinstance(loaded, Mapping):
+            if "workers" in loaded and isinstance(loaded["workers"], int):
+                settings.workers = loaded["workers"]
+            if "benchmark_run" in loaded and isinstance(loaded["benchmark_run"], bool):
+                settings.benchmark_run = loaded["benchmark_run"]
+    except Exception as e:
+        import logging as log
+
+        log.warning("ベンチマークキャッシュの読み込みに失敗しました: %s", e)
+
+    return settings
+
+
+def save_benchmark_cache(path: Path, settings: BenchmarkSettings) -> None:
+    """ベンチマーク結果をキャッシュファイルに保存する。"""
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        data = {
+            "workers": settings.workers,
+            "benchmark_run": settings.benchmark_run,
+        }
+        path.write_text(yaml.safe_dump(data, default_flow_style=False, allow_unicode=True), encoding="utf-8")
+    except Exception as e:
+        import logging as log
+
+        log.warning("ベンチマークキャッシュの保存に失敗しました: %s", e)

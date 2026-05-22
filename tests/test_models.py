@@ -5,6 +5,7 @@ import pytest
 from pydantic import ValidationError
 
 from nda.models.comment import Annotation, Comment, CommentMeta
+from nda.normalization.labels import NormalizationLabel
 
 
 def test_comment_and_meta_creation() -> None:
@@ -35,7 +36,7 @@ def test_annotation_labels_and_fields() -> None:
     ann = Annotation(
         comment_id=cid,
         experiment_id="exp-001",
-        labels={"sarcasm": 0.6},
+        labels={NormalizationLabel.URL.value: 0.6},
         method="llm",
         model="gpt-x",
         version="v1",
@@ -45,4 +46,10 @@ def test_annotation_labels_and_fields() -> None:
 
     assert ann.experiment_id == "exp-001"
     assert isinstance(ann.labels, dict)
-    assert ann.labels["sarcasm"] == pytest.approx(0.6)
+    assert ann.labels[NormalizationLabel.URL.value] == pytest.approx(0.6)
+
+
+def test_normalization_label_enum() -> None:
+    """NormalizationLabel が IDE 補完しやすい enum であることを確認する。"""
+    assert NormalizationLabel.URL.value == "safeNormalized.url"
+    assert NormalizationLabel("safeNormalized.unicode") is NormalizationLabel.UNICODE
