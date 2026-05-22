@@ -63,9 +63,7 @@ try:
                     samples["url"].append(c)
                 if not samples["unicode"] and any(ord(char) > 0x7F for char in text):
                     samples["unicode"].append(c)
-                has_control = any(ord(char) < 32 and char not in "\n\r\t" for char in text)
-                has_zero_width = any(ch in text for ch in ZERO_WIDTH)
-                is_ctrl = has_control or has_zero_width
+                is_ctrl = bool(CONTROL_PATTERN.search(text)) or any(ch in text for ch in ZERO_WIDTH)
                 if not samples["control"] and is_ctrl:
                     samples["control"].append(c)
             except (json.JSONDecodeError, ValueError):
