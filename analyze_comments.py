@@ -1,6 +1,7 @@
 import json
 import pathlib
 import sys
+from typing import cast
 
 from nda.normalization.normalizer import URL_PATTERN, ZERO_WIDTH
 
@@ -16,7 +17,7 @@ def _resolve_input_path(argv: list[str]) -> pathlib.Path:
 def _extract_text(record: dict[str, object]) -> str:
     comment = record.get("comment")
     if isinstance(comment, dict):
-        comment_data = {str(key): value for key, value in comment.items()}
+        comment_data = cast("dict[str, object]", comment)
         value = comment_data.get("text", "")
         return str(value)
     return str(record.get("text", ""))
@@ -25,7 +26,7 @@ def _extract_text(record: dict[str, object]) -> str:
 def _extract_video_id(record: dict[str, object]) -> str | None:
     meta = record.get("meta")
     if isinstance(meta, dict):
-        meta_data = {str(key): value for key, value in meta.items()}
+        meta_data = cast("dict[str, object]", meta)
         video_id = meta_data.get("video_id")
         if video_id is not None:
             return str(video_id)
@@ -36,10 +37,10 @@ def _extract_video_id(record: dict[str, object]) -> str | None:
 def _extract_created_at_text(record: dict[str, object]) -> str | None:
     meta = record.get("meta")
     if isinstance(meta, dict):
-        meta_data = {str(key): value for key, value in meta.items()}
+        meta_data = cast("dict[str, object]", meta)
         extra = meta_data.get("extra")
         if isinstance(extra, dict):
-            extra_data = {str(key): value for key, value in extra.items()}
+            extra_data = cast("dict[str, object]", extra)
             created_at_text = extra_data.get("created_at_text")
             if created_at_text is not None:
                 return str(created_at_text)
