@@ -20,6 +20,9 @@ dev = [
   "mdformat-tables>=1.0.0",
   "youtube-comment-downloader>=0.1.78",
   "pytest>=9.0.3",
+  "sphinx>=8.2.0",
+  "myst-parser>=4.0.0",
+  "furo>=2024.8.6",
 ]
 
 [build-system]

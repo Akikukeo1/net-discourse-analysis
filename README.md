@@ -54,3 +54,21 @@ uv run pytest tests/
 ```powershell
 uv run ruff check --fix ; uv run ty check ; uv run ruff format ; uv run taplo fmt ; uv run mdformat . ; uv run pytest tests/
 ```
+
+## ドキュメント
+
+本プロジェクトでは、Sphinx を使用してドキュメントを生成しています。ドキュメントのビルドには以下のコマンドを使用してください。
+docs/sphinx ディレクトリ内の `index.rst` を編集できます。
+
+```bash
+# HTMLへビルド
+uv run sphinx-build -b html docs/sphinx docs/sphinx/_build
+```
+
+```bash
+# APIドキュメント用定義ファイルを自動生成（上書き）
+uv run sphinx-apidoc -f -o docs/sphinx src/nda
+
+# HTMLへビルド
+uv run sphinx-build -b html docs/sphinx docs/sphinx/_build
+```
