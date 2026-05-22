@@ -8,9 +8,8 @@ from nda.configs.settings import load_benchmark_cache, load_benchmark_settings, 
 from nda.monitoring.logging_config import configure_logging
 
 CONFIG_PATH = Path(__file__).resolve().parent / "configs" / "hardware.yaml"
-# NOTE: 他の環境へ移動した際にベンチマークの再計測が行われるよう、
-# 環境固有の結果は Git 管理外の .cache ディレクトリに保存します。
-CACHE_PATH = Path(__file__).resolve().parent.parent.parent / ".cache" / "benchmark_result.yaml"
+# NOTE: ベンチマーク結果はユーザーごとのキャッシュ配下へ保存する
+CACHE_PATH = Path.home() / ".cache" / "net-discourse-analysis" / "benchmark_result.yaml"
 
 
 def main() -> None:
