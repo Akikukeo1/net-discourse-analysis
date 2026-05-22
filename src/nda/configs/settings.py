@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging as log
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -92,9 +93,7 @@ def load_benchmark_cache(path: Path, settings: BenchmarkSettings) -> BenchmarkSe
                 settings.workers = loaded["workers"]
             if "benchmark_run" in loaded and isinstance(loaded["benchmark_run"], bool):
                 settings.benchmark_run = loaded["benchmark_run"]
-    except Exception as e:
-        import logging as log
-
+    except (OSError, yaml.YAMLError) as e:
         log.warning("ベンチマークキャッシュの読み込みに失敗しました: %s", e)
 
     return settings
@@ -109,7 +108,5 @@ def save_benchmark_cache(path: Path, settings: BenchmarkSettings) -> None:
             "benchmark_run": settings.benchmark_run,
         }
         path.write_text(yaml.safe_dump(data, default_flow_style=False, allow_unicode=True), encoding="utf-8")
-    except Exception as e:
-        import logging as log
-
+    except (OSError, yaml.YAMLError) as e:
         log.warning("ベンチマークキャッシュの保存に失敗しました: %s", e)
