@@ -45,7 +45,7 @@ def _normalize_base(text: str) -> str:
 
 def _strip_trailing_punctuation(token: str) -> tuple[str, str]:
     """トークン末尾の句読点を分離する。"""
-    trailing_punctuation = "。、，,.!！?？:：;；)]}）】』」"  # noqa F001
+    trailing_punctuation = "。、，,.!！?？:：;；)]}）】』」"  # noqa RUF001
     trimmed = token.rstrip(trailing_punctuation)
     return trimmed, token[len(trimmed) :]
 
