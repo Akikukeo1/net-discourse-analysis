@@ -70,7 +70,7 @@ jobs:
         if: matrix.task == 'taplo'
         run: |
           # .toml ファイルをフォーマットチェック
-          find . -name '*.toml' -print0 | xargs -0 -r -n1 sh -c 'uv run taplo format --check "$0"'
+          git ls-files '*.toml' | xargs -r uv run taplo format --check
 
   required:
     runs-on: ubuntu-latest
