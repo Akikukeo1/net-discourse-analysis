@@ -81,7 +81,7 @@ def _contains_non_ascii(text: str) -> bool:
 
 
 def _contains_control(text: str) -> bool:
-    return any(ord(ch) < 32 for ch in text)
+return any(ord(ch) < 32 and ch not in "\n\r\t" for ch in text)
 
 
 def _build_sample_record(
