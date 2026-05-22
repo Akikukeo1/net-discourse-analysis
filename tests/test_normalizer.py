@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urlparse
+
 from nda.normalization.normalizer import NORMALIZATION_VERSION, normalize_analysis, normalize_safe
 
 # NOTE: 全角混在入力は可読性のため実文字で記述し、RUF001 を明示的に許可する
@@ -10,7 +12,8 @@ def test_normalize_safe_url_and_control() -> None:
     """URL を保持し、制御文字が除去されることを確認する。"""
     s = "Check this out https://example.com\nNice"
     out = normalize_safe(s)
-    assert "https://example.com" in out
+    urls = [urlparse(token) for token in out.split() if "://" in token]
+    assert any(u.scheme == "https" and u.hostname == "example.com" for u in urls)
     assert "\n" not in out
 
 
