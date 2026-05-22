@@ -33,7 +33,6 @@ from nda.normalization.normalizer import NORMALIZATION_VERSION
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = PROJECT_ROOT / "data" / "samples"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 URL_LABEL = NormalizationLabel.URL
 UNICODE_LABEL = NormalizationLabel.UNICODE
@@ -191,6 +190,8 @@ def sample_and_save(video_url: str, out_path: str | Path | None = None, limit: i
     if out_path is None:
         out_path = DATA_DIR / "safe_normalized_samples.jsonl"
     out_path = Path(out_path)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     with out_path.open("w", encoding="utf-8") as fh:
         for sample in iter_samples(video_url, limit=limit):
