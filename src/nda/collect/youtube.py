@@ -30,7 +30,6 @@ from nda.models.comment import Annotation, Comment, CommentMeta
 from nda.models.external import YouTubeComment
 from nda.normalization.labels import NormalizationLabel
 from nda.normalization.normalizer import (
-    CONTROL_PATTERN,
     NORMALIZATION_VERSION,
     URL_PATTERN,
     ZERO_WIDTH,
