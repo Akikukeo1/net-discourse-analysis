@@ -16,9 +16,7 @@ try:
                     samples["url"].append(c)
                 if not samples["unicode"] and any(ord(char) > 0x7F for char in text):
                     samples["unicode"].append(c)
-                is_ctrl = (
-any(ord(char) < 32 and char not in "\n\r\t" for char in text) or "\u200b" in text
-                )
+                is_ctrl = any(ord(char) < 32 and char not in "\n\r\t" for char in text) or "\u200b" in text
                 if not samples["control"] and is_ctrl:
                     samples["control"].append(c)
             except (json.JSONDecodeError, ValueError):
