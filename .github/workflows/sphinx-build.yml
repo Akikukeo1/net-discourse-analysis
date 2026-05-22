@@ -50,14 +50,15 @@ jobs:
         run: uv run sphinx-build -b html docs/sphinx docs/sphinx/_build
 
       - name: Commit built artifacts
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/sphinx/*.rst
           git add -f docs/sphinx/_build
           if git diff --cached --quiet; then
             echo "No build artifact changes to commit."
             exit 0
           fi
           git commit -m "chore: update Sphinx build artifacts [skip ci]"
-          git push
+          git push origin HEAD:${{ github.ref_name }}
