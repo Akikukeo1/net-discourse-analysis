@@ -11,6 +11,7 @@
         "donjayamanne.python-environment-manager",
         "kevinrose.vsc-python-indent",
         "gruntfuggly.todo-tree",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "ms-vscode.makefile-tools"
     ]
 }

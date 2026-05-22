@@ -1,6 +1,8 @@
 ci:
   autofix_prs: true
 
+exclude: ^docs/sphinx/_build/
+
 repos:
   # TODO: `taplo` の検証・整形は pre-commit のデフォルト環境では
   # 実行できないケースがあります（pre-commit.ci 等では system 実行が制限されるため）。
