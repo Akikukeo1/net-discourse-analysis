@@ -18,9 +18,10 @@ def _extract_text(record: dict[str, object]) -> str:
     comment = record.get("comment")
     if isinstance(comment, dict):
         comment_data = cast("dict[str, object]", comment)
-        value = comment_data.get("text", "")
-        return str(value)
-    return str(record.get("text", ""))
+        value = comment_data.get("text")
+        return str(value) if value is not None else ""
+    value = record.get("text")
+    return str(value) if value is not None else ""
 
 
 def _extract_video_id(record: dict[str, object]) -> str | None:
