@@ -61,10 +61,3 @@ jobs:
           fi
           git commit -m "chore: update Sphinx build artifacts [skip ci]"
           git push
-
-  required:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - run: echo "All checks passed"
