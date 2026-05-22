@@ -29,7 +29,12 @@ from youtube_comment_downloader import YoutubeCommentDownloader
 from nda.models.comment import Annotation, Comment, CommentMeta
 from nda.models.external import YouTubeComment
 from nda.normalization.labels import NormalizationLabel
-from nda.normalization.normalizer import NORMALIZATION_VERSION
+from nda.normalization.normalizer import (
+    CONTROL_PATTERN,
+    NORMALIZATION_VERSION,
+    URL_PATTERN,
+    ZERO_WIDTH,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = PROJECT_ROOT / "data" / "samples"
@@ -68,7 +73,7 @@ def _extract_video_id(video_url: str) -> str | None:
 
 
 def _contains_url(text: str) -> bool:
-    return "http://" in text or "https://" in text or "www." in text
+    return bool(URL_PATTERN.search(text))
 
 
 def _contains_non_ascii(text: str) -> bool:
@@ -80,7 +85,9 @@ def _contains_non_ascii(text: str) -> bool:
 
 
 def _contains_control(text: str) -> bool:
-    return any(ord(ch) < 32 and ch not in "\n\r\t" for ch in text)
+    has_control = bool(CONTROL_PATTERN.search(text))
+    has_zero_width = any(ch in text for ch in ZERO_WIDTH)
+    return has_control or has_zero_width
 
 
 def _build_sample_record(
