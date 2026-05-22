@@ -2,6 +2,8 @@ name: Sphinx Docs
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 permissions:
@@ -44,21 +46,47 @@ jobs:
         run: rm -rf docs/sphinx/_build
 
       - name: Generate API docs
-        run: uv run sphinx-apidoc -f -o docs/sphinx src/nda
+        run: uv run sphinx-apidoc -f -s generated.rst -o docs/sphinx src/nda
+
+      - name: Normalize generated API docs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path("docs/sphinx")
+          replacements = {
+              "modules.generated.rst": [
+                  ("   nda\n", "   nda.generated\n"),
+              ],
+              "nda.generated.rst": [
+                  ("   nda.benchmarks\n", "   nda.benchmarks.generated\n"),
+                  ("   nda.collect\n", "   nda.collect.generated\n"),
+                  ("   nda.configs\n", "   nda.configs.generated\n"),
+                  ("   nda.executors\n", "   nda.executors.generated\n"),
+                  ("   nda.hardware\n", "   nda.hardware.generated\n"),
+                  ("   nda.models\n", "   nda.models.generated\n"),
+                  ("   nda.monitoring\n", "   nda.monitoring.generated\n"),
+                  ("   nda.normalization\n", "   nda.normalization.generated\n"),
+                  ("   nda.utils\n", "   nda.utils.generated\n"),
+                  ("   nda.workers\n", "   nda.workers.generated\n"),
+              ],
+          }
+
+          for relative_path, rules in replacements.items():
+              path = root / relative_path
+              text = path.read_text(encoding="utf-8")
+              for old_text, new_text in rules:
+                  text = text.replace(old_text, new_text)
+              path.write_text(text, encoding="utf-8")
+          PY
 
       - name: Build HTML documentation
         run: uv run sphinx-build -b html docs/sphinx docs/sphinx/_build
 
-      - name: Commit built artifacts
+      - name: Publish to gh-pages
         if: github.event_name == 'push'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/sphinx/*.rst
-          git add -f docs/sphinx/_build
-          if git diff --cached --quiet; then
-            echo "No build artifact changes to commit."
-            exit 0
-          fi
-          git commit -m "chore: update Sphinx build artifacts [skip ci]"
-          git push origin HEAD:${{ github.ref_name }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs/sphinx/_build

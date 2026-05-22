@@ -8,7 +8,7 @@ nda ドキュメント
    :caption: 目次:
 
    limitations.md
-   modules
+   modules.generated
 
 索引と検索ページ
 =============================

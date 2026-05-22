@@ -67,7 +67,7 @@ uv run sphinx-build -b html docs/sphinx docs/sphinx/_build
 
 ```bash
 # APIドキュメント用定義ファイルを自動生成（上書き）
-uv run sphinx-apidoc -f -o docs/sphinx src/nda
+uv run sphinx-apidoc -f -s generated.rst -o docs/sphinx src/nda
 
 # HTMLへビルド
 uv run sphinx-build -b html docs/sphinx docs/sphinx/_build
