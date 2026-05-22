@@ -29,7 +29,12 @@ from youtube_comment_downloader import YoutubeCommentDownloader
 from nda.models.comment import Annotation, Comment, CommentMeta
 from nda.models.external import YouTubeComment
 from nda.normalization.labels import NormalizationLabel
-from nda.normalization.normalizer import NORMALIZATION_VERSION, URL_PATTERN, ZERO_WIDTH
+from nda.normalization.normalizer import (
+    CONTROL_PATTERN,
+    NORMALIZATION_VERSION,
+    URL_PATTERN,
+    ZERO_WIDTH,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = PROJECT_ROOT / "data" / "samples"
