@@ -51,32 +51,33 @@ jobs:
       - name: Normalize generated API docs
         run: |
           python - <<'PY'
+          import re
           from pathlib import Path
 
           root = Path("docs/sphinx")
-          replacements = {
-              "modules.generated.rst": [
-                  ("   nda\n", "   nda.generated\n"),
-              ],
-              "nda.generated.rst": [
-                  ("   nda.benchmarks\n", "   nda.benchmarks.generated\n"),
-                  ("   nda.collect\n", "   nda.collect.generated\n"),
-                  ("   nda.configs\n", "   nda.configs.generated\n"),
-                  ("   nda.executors\n", "   nda.executors.generated\n"),
-                  ("   nda.hardware\n", "   nda.hardware.generated\n"),
-                  ("   nda.models\n", "   nda.models.generated\n"),
-                  ("   nda.monitoring\n", "   nda.monitoring.generated\n"),
-                  ("   nda.normalization\n", "   nda.normalization.generated\n"),
-                  ("   nda.utils\n", "   nda.utils.generated\n"),
-                  ("   nda.workers\n", "   nda.workers.generated\n"),
-              ],
-          }
-
-          for relative_path, rules in replacements.items():
-              path = root / relative_path
+          for path in root.glob("*.generated.rst"):
               text = path.read_text(encoding="utf-8")
-              for old_text, new_text in rules:
-                  text = text.replace(old_text, new_text)
+              lines = []
+              in_toctree = False
+
+              for line in text.splitlines(keepends=True):
+                  stripped = line.strip()
+                  if line.startswith(".. toctree::"):
+                      in_toctree = True
+                      lines.append(line)
+                      continue
+                  if in_toctree and not line.startswith("   "):
+                      in_toctree = False
+
+                  if in_toctree and re.match(r"^   nda(\.[A-Za-z0-9_]+)*$", line):
+                      line = f"{line.rstrip()}.generated\n"
+
+                  if in_toctree and stripped == "nda":
+                      line = "   nda.generated\n"
+
+                  lines.append(line)
+
+              text = "".join(lines)
               path.write_text(text, encoding="utf-8")
           PY
 
