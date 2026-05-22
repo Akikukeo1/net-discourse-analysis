@@ -30,6 +30,7 @@ from nda.models.comment import Annotation, Comment, CommentMeta
 from nda.models.external import YouTubeComment
 from nda.normalization.labels import NormalizationLabel
 from nda.normalization.normalizer import (
+    CONTROL_PATTERN,
     NORMALIZATION_VERSION,
     URL_PATTERN,
     ZERO_WIDTH,
@@ -84,7 +85,7 @@ def _contains_non_ascii(text: str) -> bool:
 
 
 def _contains_control(text: str) -> bool:
-    has_control = any(ord(ch) < 32 and ch not in "\n\r\t" for ch in text)
+    has_control = bool(CONTROL_PATTERN.search(text))
     has_zero_width = any(ch in text for ch in ZERO_WIDTH)
     return has_control or has_zero_width
 
