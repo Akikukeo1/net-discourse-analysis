@@ -37,7 +37,7 @@ nda = "nda.cli:main"
 pythonpath = ["src"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/nda"]
+packages = ["src"]
 
 [tool.uv]
 package = true
