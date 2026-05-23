@@ -7,4 +7,10 @@ merge_protections:
       - "#commits-behind <= 1"
 merge_protections_settings:
   auto_merge_conditions: true
-  reporting_method: check-runs
+pull_request_rules:
+  - name: Automatic merge
+    description: Merge when PR passes all branch protection and has label automerge
+    conditions:
+      - label = automerge
+    actions:
+      merge:
