@@ -1,0 +1,9 @@
+merge_protections:
+  - name: 古いPRのマージを禁止
+    description: マージ前にPRが最新の状態に近いことを確認します
+    if:
+      - base = main
+    success_conditions:
+      - "#commits-behind <= 1"
+merge_protections_settings:
+  auto_merge_conditions: true
