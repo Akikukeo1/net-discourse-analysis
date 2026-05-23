@@ -19,7 +19,7 @@ pull_request_rules:
         toggle:
           - conflict
   - name: PRにTシャツサイズを割り当て
-    description: 変更行数に基づいて、プルリクエストにTシャツサイズのラベルを割り当てます。 of lines changed.
+    description: 変更行数に基づいて、プルリクエストにTシャツサイズのラベルを割り当てます。
     conditions:
       - "#modified-lines >= 100"
       - "#modified-lines < 500"
