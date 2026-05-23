@@ -18,11 +18,9 @@ MENTION_TOKEN = "[MENTION]"
 HASHTAG_TOKEN = "[HASHTAG]"
 NORMALIZATION_VERSION = "nfkc-v1.1"
 
-# NOTE: We prefer to convert enclosed/parenthesized digits to their ASCII
-# equivalents via NFKC normalization rather than removing them. Do not strip
-# enclosed alphanumerics before normalization.
-# Remove RIGHT SINGLE QUOTATION MARK (U+2019) but keep LEFT SINGLE QUOTATION MARK
-# when present, to match legacy expectations in tests.
+# NOTE: 丸付き数字や括弧付き数字は削除せず、NFKC正規化によってASCII互換文字に変換することを優先します。
+# 正規化の前に囲み英数字を除去しないでください。
+# テストの既存の期待値に合わせるため、右シングルクォート U+2019 は削除しますが、左シングルクォートは保持します。
 BAD_CHARS = "\u2019"
 
 # TODO: 互換文字の扱いを用途別に切り替える設定を追加したい
