@@ -29,11 +29,7 @@ jobs:
 
       - name: Install dependencies
         run: uv sync
-
-      - name: Build
-        run: uv build
-
-      - name: Release
+      - name: Build and Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run semantic-release publish
+        run: uv run semantic-release version --commit --tag --no-push && uv build && uv run semantic-release publish
