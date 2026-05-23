@@ -139,6 +139,7 @@ default = "semantic-release <semantic-release>"
 [tool.semantic_release.commit_parser_options]
 minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]
+# FIXME: allowed_tags をやめ、 minor_tags, patch_tags, other_allowed_tags の3本に将来的に分割したい。
 other_allowed_tags = [
   "build",
   "chore",
