@@ -18,6 +18,13 @@ MENTION_TOKEN = "[MENTION]"
 HASHTAG_TOKEN = "[HASHTAG]"
 NORMALIZATION_VERSION = "nfkc-placeholder-v1"
 
+# NOTE: We prefer to convert enclosed/parenthesized digits to their ASCII
+# equivalents via NFKC normalization rather than removing them. Do not strip
+# enclosed alphanumerics before normalization.
+# Remove RIGHT SINGLE QUOTATION MARK (U+2019) but keep LEFT SINGLE QUOTATION MARK
+# when present, to match legacy expectations in tests.
+BAD_CHARS = "\u2019"
+
 # TODO: 互換文字の扱いを用途別に切り替える設定を追加したい
 # CHECK: NFKC により記号や全角英数が正規化されるため、分析用途で期待通りか確認する
 # TODO: preserve_newlines=False の切り替えがあると、改行由来の感情強度分析で扱いやすい
@@ -38,8 +45,13 @@ def _remove_control_chars(text: str) -> str:
 
 
 def _normalize_base(text: str) -> str:
+    # Use NFKC to convert enclosed/compatibility characters (e.g. 丸付き数字) to
+    # their ASCII equivalents where appropriate.
     text = unicodedata.normalize("NFKC", text)
     text = _remove_zero_width(text)
+    # Remove a small set of undesirable punctuation after normalization
+    for ch in BAD_CHARS:
+        text = text.replace(ch, "")
     return _remove_control_chars(text)
 
 

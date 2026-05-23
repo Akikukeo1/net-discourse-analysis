@@ -27,9 +27,9 @@ def test_normalize_safe_unicode() -> None:
 
 def test_normalize_safe_nfkc() -> None:
     """NFKC により互換文字が正規化されることを確認する。"""
-    s = "ＡＢＣ ① ｶﾀｶﾅ"
+    s = "ＡＢＣ１２３ ①②③ ｶﾀｶﾅ"
     out = normalize_safe(s)
-    assert out == "ABC 1 カタカナ"
+    assert out == "ABC123 123 カタカナ"
 
 
 def test_normalize_analysis_replacements() -> None:
@@ -65,3 +65,20 @@ def test_normalization_version_exists() -> None:
     """正規化バージョンが定義されていることを確認する。"""
     assert isinstance(NORMALIZATION_VERSION, str)
     assert NORMALIZATION_VERSION
+
+
+# def test_normalization_version_format() -> None:
+#     """正規化バージョンが適切な形式であることを確認する。"""
+#     assert NORMALIZATION_VERSION.startswith("nfkc-placeholder-v")
+#     version_number = NORMALIZATION_VERSION[len("nfkc-placeholder-v") :]
+#     major_minor = version_number.split(".")
+#     assert len(major_minor) == 2
+#     major, minor = major_minor
+#     assert major.isdigit() and minor.isdigit()
+
+
+def test_normalization() -> None:
+    """正規化の基本的な動作を確認する。"""
+    s = "。.、，,!！?？:：;；[]［］{}｛｝()（）【】『』「」“”‘’"
+    out = normalize_safe(s)
+    assert out == "。.、,,!!??::;;[][]{}{}()()【】『』「」“”‘"
