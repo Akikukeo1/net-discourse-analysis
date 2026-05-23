@@ -45,12 +45,11 @@ def _remove_control_chars(text: str) -> str:
 def _normalize_base(text: str) -> str:
     # Use NFKC to convert enclosed/compatibility characters (e.g. 丸付き数字) to
     # their ASCII equivalents where appropriate.
+    # 丸付き数字などの互換文字を、必要に応じてNFKCでASCII互換文字に変換します。
     text = unicodedata.normalize("NFKC", text)
     text = _remove_zero_width(text)
-    # Remove a small set of undesirable punctuation after normalization
-    for ch in BAD_CHARS:
-        text = text.replace(ch, "")
-    return _remove_control_chars(text)
+    # 正規化後、不要な記号を除去します。
+    return text.translate(str.maketrans("", "", BAD_CHARS))
 
 
 def _strip_trailing_punctuation(token: str) -> tuple[str, str]:
