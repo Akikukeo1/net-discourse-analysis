@@ -19,8 +19,8 @@ pull_request_rules:
       label:
         toggle:
           - size/L
-  - name: Label Mergify Stacks PRs
-    description: Pull requests that are part of a Mergify stack should be labeled as such
+  - name: Mergify Stacks PRのラベル付け
+    description: Mergify stackの一部であるプルリクエストにラベルを付与します
     conditions:
       - "commits[0].commit_message ~= (?m)Change-Id:"
     actions:
