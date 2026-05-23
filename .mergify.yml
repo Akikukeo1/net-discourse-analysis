@@ -5,21 +5,9 @@ merge_protections:
       - base = main
     success_conditions:
       - "#commits-behind <= 1"
-merge_protections_settings:
-  auto_merge_conditions: true
-  reporting_method: check-runs
 pull_request_rules:
-  - name: 競合のある PR にラベルを付ける
-    description: 競合のある PR にラベルを付け、見つけやすくする
-    conditions:
-      - conflict
-      - -closed
-    actions:
-      label:
-        toggle:
-          - conflict
   - name: PRにTシャツサイズを割り当て
-    description: 変更行数に基づいて、プルリクエストにTシャツサイズのラベルを割り当てます。
+    description: 変更行数に基づいて、プルリクエストにTシャツサイズのラベルを割り当てます。 of lines changed.
     conditions:
       - "#modified-lines >= 100"
       - "#modified-lines < 500"
@@ -41,3 +29,5 @@ pull_request_rules:
       - label = automerge
     actions:
       merge:
+merge_protections_settings:
+  reporting_method: check-runs
