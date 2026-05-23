@@ -16,7 +16,7 @@ ZERO_WIDTH = "\u200b\u200c\u200d\ufeff"
 URL_TOKEN = "[URL]"
 MENTION_TOKEN = "[MENTION]"
 HASHTAG_TOKEN = "[HASHTAG]"
-NORMALIZATION_VERSION = "nfkc-placeholder-v1"
+NORMALIZATION_VERSION = "nfkc-v1.1"
 
 # NOTE: We prefer to convert enclosed/parenthesized digits to their ASCII
 # equivalents via NFKC normalization rather than removing them. Do not strip
