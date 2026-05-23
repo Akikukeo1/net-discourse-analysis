@@ -1,0 +1,11 @@
+pull_request_rules:
+  - name: automatic merge on green
+    conditions:
+      - base=main
+      - label=automerge
+      - check-success=required
+      - -conflict
+    actions:
+      update:
+      merge:
+        method: squash
