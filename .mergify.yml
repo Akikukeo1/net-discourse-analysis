@@ -9,8 +9,8 @@ merge_protections_settings:
   auto_merge_conditions: true
   reporting_method: check-runs
 pull_request_rules:
-  - name: Automatic merge
-    description: Merge when PR passes all branch protection and has label automerge
+  - name: 自動マージ
+    description: ブランチ保護ルールをパスし、automergeラベルが付与されたPRを自動マージします
     conditions:
       - label = automerge
     actions:
