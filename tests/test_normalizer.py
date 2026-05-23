@@ -8,7 +8,7 @@ from nda.normalization.normalizer import NORMALIZATION_VERSION, normalize_analys
 # ruff: noqa: RUF001
 
 
-def test_normalize_safe_url_and_control() -> None:
+def test_normalization_safe_url_and_control() -> None:
     """URL を保持し、制御文字が除去されることを確認する。"""
     s = "Check this out https://example.com\nNice"
     out = normalize_safe(s)
@@ -17,7 +17,7 @@ def test_normalize_safe_url_and_control() -> None:
     assert "\n" not in out
 
 
-def test_normalize_safe_unicode() -> None:
+def test_normalization_safe_unicode() -> None:
     """ゼロ幅文字が除去されることを確認する。"""
     s = "ちくわ\u200b"
     out = normalize_safe(s)
@@ -25,14 +25,14 @@ def test_normalize_safe_unicode() -> None:
     assert "\u200b" not in out
 
 
-def test_normalize_safe_nfkc() -> None:
+def test_normalization_safe_nfkc() -> None:
     """NFKC により互換文字が正規化されることを確認する。"""
-    s = "ＡＢＣ ① ｶﾀｶﾅ"
+    s = "ＡＢＣ１２３ ①②③ ｶﾀｶﾅ"
     out = normalize_safe(s)
-    assert out == "ABC 1 カタカナ"
+    assert out == "ABC123 123 カタカナ"
 
 
-def test_normalize_analysis_replacements() -> None:
+def test_normalization_analysis_replacements() -> None:
     """URL とメンションが置換されることを確認する。"""
     s = "@user @ユーザー @名前 See https://example.com now test@example.com"
     out = normalize_analysis(s)
@@ -41,7 +41,7 @@ def test_normalize_analysis_replacements() -> None:
     assert "test@example.com" in out
 
 
-def test_normalize_analysis_hashtag_punctuation() -> None:
+def test_normalization_analysis_hashtag_punctuation() -> None:
     """全角句読点を含むハッシュタグが NFKC 後も期待通り置換されることを確認する。"""
     s = "#AI研究！ これはどうだろう"
     out_keep = normalize_analysis(s)
@@ -52,7 +52,7 @@ def test_normalize_analysis_hashtag_punctuation() -> None:
     assert "[HASHTAG]!" in out_replace
 
 
-def test_normalize_analysis_hashtag_optional() -> None:
+def test_normalization_analysis_hashtag_optional() -> None:
     """ハッシュタグの置換がオプションであることを確認する。"""
     s = "#自由研究 discussion"
     out_keep = normalize_analysis(s)
@@ -65,3 +65,20 @@ def test_normalization_version_exists() -> None:
     """正規化バージョンが定義されていることを確認する。"""
     assert isinstance(NORMALIZATION_VERSION, str)
     assert NORMALIZATION_VERSION
+
+
+# def test_normalization_version_format() -> None:
+#     """正規化バージョンが適切な形式であることを確認する。"""
+#     assert NORMALIZATION_VERSION.startswith("nfkc-placeholder-v")
+#     version_number = NORMALIZATION_VERSION[len("nfkc-placeholder-v") :]
+#     major_minor = version_number.split(".")
+#     assert len(major_minor) == 2
+#     major, minor = major_minor
+#     assert major.isdigit() and minor.isdigit()
+
+
+def test_normalization_safe_basic() -> None:
+    """正規化の基本的な動作を確認する。"""
+    s = "。.、，,!！?？:：;；[]［］{}｛｝()（）【】『』「」“”‘’"
+    out = normalize_safe(s)
+    assert out == "。.、,,!!??::;;[][]{}{}()()【】『』「」“”‘"

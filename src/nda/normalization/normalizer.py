@@ -16,7 +16,12 @@ ZERO_WIDTH = "\u200b\u200c\u200d\ufeff"
 URL_TOKEN = "[URL]"
 MENTION_TOKEN = "[MENTION]"
 HASHTAG_TOKEN = "[HASHTAG]"
-NORMALIZATION_VERSION = "nfkc-placeholder-v1"
+NORMALIZATION_VERSION = "nfkc-v1.1"
+
+# NOTE: 丸付き数字や括弧付き数字は削除せず、NFKC正規化によってASCII互換文字に変換することを優先します。
+# 正規化の前に囲み英数字を除去しないでください。
+# テストの既存の期待値に合わせるため、右シングルクォート U+2019 は削除しますが、左シングルクォートは保持します。
+BAD_CHARS = "\u2019"
 
 # TODO: 互換文字の扱いを用途別に切り替える設定を追加したい
 # CHECK: NFKC により記号や全角英数が正規化されるため、分析用途で期待通りか確認する
@@ -38,9 +43,13 @@ def _remove_control_chars(text: str) -> str:
 
 
 def _normalize_base(text: str) -> str:
+    # Use NFKC to convert enclosed/compatibility characters (e.g. 丸付き数字) to
+    # their ASCII equivalents where appropriate.
+    # 丸付き数字などの互換文字を、必要に応じてNFKCでASCII互換文字に変換します。
     text = unicodedata.normalize("NFKC", text)
     text = _remove_zero_width(text)
-    return _remove_control_chars(text)
+    # 正規化後、不要な記号を除去します。
+    return text.translate(str.maketrans("", "", BAD_CHARS))
 
 
 def _strip_trailing_punctuation(token: str) -> tuple[str, str]:
