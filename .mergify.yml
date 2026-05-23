@@ -4,7 +4,7 @@ merge_protections:
     if:
       - base = main
     success_conditions:
-      - "#commits-behind <= 1"
+      - "#commits-behind <= 10"
 pull_request_rules:
   - name: PRにTシャツサイズを割り当て
     description: 変更行数に基づいて、プルリクエストにTシャツサイズのラベルを割り当てます。
