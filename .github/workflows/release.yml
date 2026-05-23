@@ -35,6 +35,11 @@ jobs:
         run: |
           git reset --hard ${{ github.sha }}
 
+      - name: Setup | Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+
       - name: Action | Semantic Version Release
         id: release
         # Adjust tag with desired version if applicable.
@@ -43,20 +48,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           git_committer_name: "github-actions"
           git_committer_email: "actions@users.noreply.github.com"
-
-      - name: Setup | Setup Python for build
-        if: steps.release.outputs.released == 'true'
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.13'
-
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      - name: Build | Create distribution artifacts
-        if: steps.release.outputs.released == 'true'
-        run: |
-          uv sync --no-dev --no-lock
-          uv build
 
       - name: Publish | Upload to GitHub Release Assets
         uses: python-semantic-release/publish-action@v10.5.3
