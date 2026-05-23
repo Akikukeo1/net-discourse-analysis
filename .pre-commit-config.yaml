@@ -1,7 +1,7 @@
 ci:
   autofix_prs: true
 
-exclude: ^docs/sphinx/_build/
+exclude: '^(docs/sphinx/_build/|data/|.venv/|.venv/Lib/site-packages)'
 
 repos:
   # TODO: `taplo` の検証・整形は pre-commit のデフォルト環境では
