@@ -105,6 +105,7 @@ allow_zero_version = true
 no_git_verify = false
 tag_format = "v{version}"
 add_partial_tags = false
+build_command = "uv build"
 
 [tool.semantic_release.branches.main]
 match = "(main|master)"
