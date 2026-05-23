@@ -1,5 +1,5 @@
 merge_protections:
-  - name: Do not merge outdated PRs
+  - name: 古いPRのマージを禁止
     description: Make sure PRs are almost up to date before merging
     if:
       - base = main
