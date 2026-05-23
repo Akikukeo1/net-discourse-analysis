@@ -9,6 +9,24 @@ merge_protections_settings:
   auto_merge_conditions: true
   reporting_method: check-runs
 pull_request_rules:
+  - name: Assign t-shirt size to PR
+    description: Assign a t-shirt size label to a pull request based on the number
+      of lines changed.
+    conditions:
+      - "#modified-lines >= 100"
+      - "#modified-lines < 500"
+    actions:
+      label:
+        toggle:
+          - size/L
+  - name: Label Mergify Stacks PRs
+    description: Pull requests that are part of a Mergify stack should be labeled as such
+    conditions:
+      - "commits[0].commit_message ~= (?m)Change-Id:"
+    actions:
+      label:
+        toggle:
+          - stack
   - name: 自動マージ
     description: ブランチ保護ルールをパスし、automergeラベルが付与されたPRを自動マージします
     conditions:
