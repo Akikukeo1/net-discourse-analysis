@@ -9,8 +9,8 @@ merge_protections_settings:
   auto_merge_conditions: true
   reporting_method: check-runs
 pull_request_rules:
-  - name: Assign t-shirt size to PR
-    description: Assign a t-shirt size label to a pull request based on the number
+  - name: PRにTシャツサイズを割り当て
+    description: 変更行数に基づいて、プルリクエストにTシャツサイズのラベルを割り当てます。
       of lines changed.
     conditions:
       - "#modified-lines >= 100"
