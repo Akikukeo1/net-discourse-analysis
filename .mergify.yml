@@ -9,8 +9,8 @@ merge_protections_settings:
   auto_merge_conditions: true
   reporting_method: check-runs
 pull_request_rules:
-  - name: Mergify Stacks PRのラベル付け
-    description: Mergify stackの一部であるプルリクエストにラベルを付与します
+  - name: MergifyスタックPRのラベル付け
+    description: Mergifyスタックの一部であるPRにラベルを付与します
     conditions:
       - "commits[0].commit_message ~= (?m)Change-Id:"
     actions:
