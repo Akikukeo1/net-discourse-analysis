@@ -50,12 +50,12 @@ jobs:
           git_committer_email: "actions@users.noreply.github.com"
           build: false
 
-      - name: Build | Create distribution artifacts
-        if: steps.release.outputs.released == 'true'
-        run: |
-          which uv
-          uv --version
-          uv build
+      # - name: Build | Create distribution artifacts
+      #   if: steps.release.outputs.released == 'true'
+      #   run: |
+      #     which uv
+      #     uv --version
+      #     uv build
 
       - name: Publish | Upload to GitHub Release Assets
         uses: python-semantic-release/publish-action@v10.5.3
@@ -64,11 +64,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.release.outputs.tag }}
 
-      - name: Upload | Distribution Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: distribution-artifacts
-          path: dist
+      # - name: Upload | Distribution Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: distribution-artifacts
+      #     path: dist
           if-no-files-found: error
 
     outputs:
