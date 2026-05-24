@@ -27,10 +27,8 @@
 ```bash
 uv venv
 uv sync
-uv run pre-commit install
+uv run pre-commit install  # 任意
 ```
-
-`ty check` は GitHub Actions で実行します。
 
 スクリプトの実行は以下のコマンドで行います。
 
