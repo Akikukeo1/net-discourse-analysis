@@ -1,84 +1,144 @@
 from __future__ import annotations
 
-from urllib.parse import urlparse
+import re
+import unicodedata
 
-from nda.normalization.normalizer import NORMALIZATION_VERSION, normalize_analysis, normalize_safe
+import pytest
 
-# NOTE: 全角混在入力は可読性のため実文字で記述し、RUF001 を明示的に許可する
+from nda.normalization.normalizer import (
+    MENTION_TOKEN,
+    NORMALIZATION_VERSION,
+    URL_TOKEN,
+    normalize,
+)
+
+# HACK: 全角混在入力は可読性のため実文字で記述し、RUF001 を明示的に許可する
 # ruff: noqa: RUF001
 
 
-def test_normalization_safe_url_and_control() -> None:
-    """URL を保持し、制御文字が除去されることを確認する。"""
-    s = "Check this out https://example.com\nNice"
-    out = normalize_safe(s)
-    urls = [urlparse(token) for token in out.split() if "://" in token]
-    assert any(u.scheme == "https" and u.hostname == "example.com" for u in urls)
-    assert "\n" not in out
+@pytest.mark.parametrize(
+    "invalid_value",
+    [
+        pytest.param(None),
+        pytest.param(123),
+        pytest.param(45.6),
+        pytest.param(["strではない文字列リスト"]),
+        pytest.param({"k": "v"}),
+        pytest.param(True),
+    ],
+)
+def test_normalize_validates_input_type(invalid_value: object) -> None:
+    """文字列以外の入力に対して TypeError を送出することを確認する。"""
+    with pytest.raises(TypeError):
+        # HACK: cast で型を偽造するのは冗長なので、チェッカーを黙らせる
+        normalize(invalid_value)  # type: ignore[arg-type]
 
 
-def test_normalization_safe_unicode() -> None:
-    """ゼロ幅文字が除去されることを確認する。"""
-    s = "ちくわ\u200b"
-    out = normalize_safe(s)
-    assert "ちくわ" in out
-    assert "\u200b" not in out
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param("", ""),
+        pytest.param(" ", ""),
+        pytest.param("     ", ""),
+        pytest.param("　", ""),
+        pytest.param("\n\n\n\r\n\t", ""),
+        pytest.param("   \n", ""),
+    ],
+)
+def test_normalize_returns_empty_for_blank_input(text: str, expected: str) -> None:
+    """空文字または実質空文字の入力で空文字を返すことを確認する。"""
+    assert normalize(text) == expected
 
 
-def test_normalization_safe_nfkc() -> None:
-    """NFKC により互換文字が正規化されることを確認する。"""
-    s = "ＡＢＣ１２３ ①②③ ｶﾀｶﾅ"
-    out = normalize_safe(s)
-    assert out == "ABC123 123 カタカナ"
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param("http://example.com/page?id=1&name=test#hash", URL_TOKEN),
+        pytest.param("HTTPS://EXAMPLE.COM", URL_TOKEN),
+        pytest.param("www.example.co.jp/index.html", URL_TOKEN),
+        pytest.param("検索はwww.google.comで", f"検索は{URL_TOKEN}"),
+        pytest.param("http://a.com http://b.com", f"{URL_TOKEN} {URL_TOKEN}"),
+        pytest.param("http://a.comhttp://b.com", URL_TOKEN),
+        pytest.param("このサイト見てhttps://omoshi.roi.yo?id=3！！！", f"このサイト見て{URL_TOKEN}"),
+    ],
+)
+def test_normalize_replaces_url(text: str, expected: str) -> None:
+    """URL が置換されることを確認する。"""
+    assert normalize(text) == expected
 
 
-def test_normalization_analysis_replacements() -> None:
-    """URL とメンションが置換されることを確認する。"""
-    s = "@user @ユーザー @名前 See https://example.com now test@example.com"
-    out = normalize_analysis(s)
-    assert "[MENTION]" in out
-    assert "[URL]" in out
-    assert "test@example.com" in out
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param("@user", MENTION_TOKEN),
+        pytest.param("@user123!", f"{MENTION_TOKEN}!"),
+        pytest.param("@ユーザーです。のです、", f"{MENTION_TOKEN}、"),
+        pytest.param("@alice,@bob", f"{MENTION_TOKEN},{MENTION_TOKEN}"),
+        pytest.param("info@example.com", "info@example.com"),
+        pytest.param("(@user)と[@admin]", f"({MENTION_TOKEN})と[{MENTION_TOKEN}]"),
+    ],
+)
+def test_normalize_replaces_mentions_and_preserves_punctuation(text: str, expected: str) -> None:
+    """メンション置換と句読点の分離が仕様どおりに動作することを確認する。"""
+    assert normalize(text) == expected
 
 
-def test_normalization_analysis_hashtag_punctuation() -> None:
-    """全角句読点を含むハッシュタグが NFKC 後も期待通り置換されることを確認する。"""
-    s = "#AI研究！ これはどうだろう"
-    out_keep = normalize_analysis(s)
-    out_replace = normalize_analysis(s, replace_hashtag=True)
-    assert "#AI研究" in out_keep
-    assert "！" not in out_keep
-    assert "!" in out_keep
-    assert "[HASHTAG]!" in out_replace
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param("こんにちは\u200b世界", "こんにちは世界"),
+        pytest.param("A\x00B\x07C\x1fD", "ABCD"),
+        pytest.param("\ufeffサロゲートペア等", "サロゲートペア等"),
+    ],
+)
+def test_normalize_removes_invisible_chars(text: str, expected: str) -> None:
+    """ゼロ幅文字と制御文字が除去されることを確認する。"""
+    assert normalize(text) == expected
 
 
-def test_normalization_analysis_hashtag_optional() -> None:
-    """ハッシュタグの置換がオプションであることを確認する。"""
-    s = "#自由研究 discussion"
-    out_keep = normalize_analysis(s)
-    out_replace = normalize_analysis(s, replace_hashtag=True)
-    assert "#自由研究" in out_keep
-    assert "[HASHTAG]" in out_replace
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param("  連続する   スペースの    削減  ", "連続するスペースの削減"),
+        pytest.param("文字の間に\n改行や\tタブが\r\n混ざる", "文字の間に 改行や タブが 混ざる"),
+        pytest.param("検索 エンジン", "検索エンジン"),
+    ],
+)
+def test_normalize_normalizes_whitespace(text: str, expected: str) -> None:
+    """空白や改行が正規化されることを確認する。"""
+    assert normalize(text) == expected
 
 
-def test_normalization_version_exists() -> None:
-    """正規化バージョンが定義されていることを確認する。"""
-    assert isinstance(NORMALIZATION_VERSION, str)
-    assert NORMALIZATION_VERSION
+def test_normalize_limits_repetition_marks() -> None:
+    """記号連続が正規化されることを確認する。"""
+    out = normalize("ああああああああーーーーーーーっっっっっっっっっ！！！！！！！")
+    assert out == "あああーっっっ!!!"
 
 
-# def test_normalization_version_format() -> None:
-#     """正規化バージョンが適切な形式であることを確認する。"""
-#     assert NORMALIZATION_VERSION.startswith("nfkc-placeholder-v")
-#     version_number = NORMALIZATION_VERSION[len("nfkc-placeholder-v") :]
-#     major_minor = version_number.split(".")
-#     assert len(major_minor) == 2
-#     major, minor = major_minor
-#     assert major.isdigit() and minor.isdigit()
+@pytest.mark.parametrize(
+    "text",
+    [
+        # NOTE: この2つは見た目は同じだけど、中は異なるので注意!!!!!
+        pytest.param(unicodedata.normalize("NFD", "ディスプレイを買った")),
+        pytest.param(unicodedata.normalize("NFC", "ディスプレイを買った")),
+    ],
+)
+def test_normalize_handles_nfd_mac_compatibility(text: str) -> None:
+    """Mac特有の濁点分離文字列が、ディスプレイを買った に正規化されることを確認する。"""
+    assert normalize(text) == "ディスプレイを買った"
 
 
-def test_normalization_safe_basic() -> None:
-    """正規化の基本的な動作を確認する。"""
-    s = "。.、，,!！?？:：;；[]［］{}｛｝()（）【】『』「」“”‘’"
-    out = normalize_safe(s)
-    assert out == "。.、,,!!??::;;[][]{}{}()()【】『』「」“”‘"
+def test_normalize_all_in_one_case() -> None:
+    """複数要素が混在する入力でもトークン置換と不可視文字除去が維持されることを確認する。"""
+    text = (
+        " \x00  @yamada-san!!（詳細は www.example.com/マニュアル を参照のこと）\u200b\n"
+        "失礼しましたーーーっ！！！   "
+    )
+    assert normalize(text) == f"{MENTION_TOKEN}!!(詳細は{URL_TOKEN}を参照のこと) 失礼しましたーっ!!!"
+
+
+def test_normalization_version_format() -> None:
+    """正規化バージョンが '数字.数字' 形式の文字列であることを確認する。"""
+    # メジャー/マイナーともに先頭に不要な0を許可しない
+    # 例: "0.1" は有効だが "00.1" や "0.01" は無効とする
+    assert re.match(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)$", NORMALIZATION_VERSION) is not None
