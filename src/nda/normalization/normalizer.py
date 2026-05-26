@@ -5,13 +5,19 @@ import unicodedata
 from re import Pattern
 from typing import Final
 
-import neologdn  # type: ignore # noqa: PGH003
+import neologdn  # HACK: 誤検知を黙らせる # type: ignore # noqa: PGH003
 
 NORMALIZATION_VERSION: Final[str] = "0.1"
 
 URL_TOKEN: Final[str] = "[URL]"
 MENTION_TOKEN: Final[str] = "[MENTION]"
-TRAILING_PUNCTUATION: Final[str] = "。、，,.!！?？:：;；)]}）】』」"  # noqa RUF001
+
+TRAILING_PUNCTUATION: Final[str] = (
+    "。、，,"  # 読点・カンマ  # noqa RUF001
+    "!！?？"  # 感嘆符・疑問符  # noqa RUF001
+    ":：;；"  # コロン・セミコロン  # noqa RUF001
+    ")}]）】』」"  # 閉じ括弧系  # noqa RUF001
+)
 
 URL_PATTERN: Pattern[str] = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
 
@@ -35,20 +41,20 @@ def _remove_invisible_chars(text: str) -> str:
     return INVISIBLE_PATTERN.sub("", text)
 
 
-def _strip_trailing_punctuation(token: str) -> tuple[str, str]:
-    """トークン末尾の句読点を分離する。"""
+def _extract_trailing_punctuation(token: str) -> str:
+    """トークン末尾の句読点部分『のみ』を抽出して返す。"""
     trimmed = token.rstrip(TRAILING_PUNCTUATION)
-    return trimmed, token[len(trimmed) :]
+    return token[len(trimmed) :]
+
+
+def _mention_replacer(match: re.Match[str]) -> str:
+    """MENTION_PATTERN にマッチした文字列から末尾の句読点のみを抽出し、置換トークンと結合する。"""
+    suffix = _extract_trailing_punctuation(match.group(0))
+    return f"{MENTION_TOKEN}{suffix}"
 
 
 def _replace_urls(text: str) -> str:
     return URL_PATTERN.sub(URL_TOKEN, text)
-
-
-def _mention_replacer(match: re.Match[str]) -> str:
-    """MENTION_PATTERN にマッチした文字列から末尾の句読点を分離し、置換トークンを生成する。"""
-    _, suffix = _strip_trailing_punctuation(match.group(0))
-    return f"{MENTION_TOKEN}{suffix}"
 
 
 def _replace_mentions(text: str) -> str:
@@ -57,22 +63,19 @@ def _replace_mentions(text: str) -> str:
 
 
 def normalize(text: str) -> str:
-    """正規化を行う。
-
-    - URL を [URL] に置換
-    - メンションを [MENTION] に置換
-    - neologdn による日本語テキスト正規化
-    - ゼロ幅文字と制御文字の削除
-    - 空白の正規化
-    """
+    """正規化を行う。"""
     if not isinstance(text, str):
         raise TypeError(f"text は str 型である必要があります。 got: {type(text).__name__}")
-    if not text.strip():
+
+    if not text or text.isspace():
         return ""
 
     text = _replace_urls(text)
     text = _replace_mentions(text)
+
+    text = unicodedata.normalize("NFKC", text)
+
     text = neologdn.normalize(text, tilde="normalize", repeat=3)
+
     text = _remove_invisible_chars(text)
-    text = _normalize_whitespace(text)
-    return unicodedata.normalize("NFC", text)
+    return _normalize_whitespace(text)
