@@ -146,3 +146,15 @@ def test_normalization_version_format() -> None:
     # メジャー/マイナーともに先頭に不要な0を許可しない
     # 例: "0.1" は有効だが "00.1" や "0.01" は無効とする
     assert re.match(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)$", NORMALIZATION_VERSION) is not None
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        pytest.param("㈱ほげほげ", "(株)ほげほげ"),
+        pytest.param("(株)ほげほげ", "(株)ほげほげ"),
+    ],
+)
+def test_normalize_parenthesized_corporation(text: str, expected: str) -> None:
+    """互換文字と丸括弧の法人表記が NFKC 適用後に期待どおり変換されることを確認する。"""
+    assert normalize(text) == expected
