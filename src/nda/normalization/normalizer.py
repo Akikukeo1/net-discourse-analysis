@@ -60,10 +60,7 @@ def normalize(text: str) -> str:
     - 空白の正規化
     """
     if not isinstance(text, str):
-        raise TypeError(
-            f"text は str 型である必要があります。 "
-            f"got: {type(text).__name__}"
-        )
+        raise TypeError(f"text は str 型である必要があります。 got: {type(text).__name__}")
     if not text.strip():
         return ""
 
