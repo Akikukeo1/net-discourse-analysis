@@ -137,8 +137,8 @@ def test_normalize_all_in_one_case() -> None:
     """複数要素が混在する入力でもトークン置換と不可視文字除去が維持されることを確認する。"""
     # NOTE: トリプルクオートにして、全角スペースなどを混ぜる。これはインデントではないので注意。
     text = """ \x00  @yamada-san!!（詳細は www.example.com/マニュアル を参照のこと）\u200b
-                  　　失礼しましたーーーっ！！！   """
-    assert normalize(text) == f"{MENTION_TOKEN}!!(詳細は{URL_TOKEN}を参照のこと) 失礼しましたーっ!!!"
+                  　　失礼しましたーーーっ！！！    |   ！！！！！！   """
+    assert normalize(text) == f"{MENTION_TOKEN}!!(詳細は{URL_TOKEN}を参照のこと) 失礼しましたーっ!!! | !!!"
 
 
 def test_normalization_version_format() -> None:
