@@ -14,8 +14,12 @@ MENTION_TOKEN: Final[str] = "[MENTION]"
 TRAILING_PUNCTUATION: Final[str] = "。、，,.!！?？:：;；)]}）】』」"  # noqa RUF001
 
 URL_PATTERN: Pattern[str] = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
+
+# FIXME: youtube.pyのリファクタまで、一時的にこの2つを追加しておく。
+# FIXME: 絶対に消す!!!!!
 CONTROL_PATTERN: Pattern[str] = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]")
 ZERO_WIDTH: tuple[str, ...] = ("\u200b", "\u200c", "\u200d", "\ufeff")
+
 # NOTE: 日本語を含むメンション/ハッシュタグを想定し、空白や区切り記号で終了するようにする
 # NOTE: メンションの境界は email 誤爆を避けるため、負の後読みで十分か確認する
 MENTION_PATTERN: Pattern[str] = re.compile(r"(?<!\w)@[^\s@#()\[\]\{\}（）［］｛｝、，,]+", re.UNICODE)  # noqa RUF001
