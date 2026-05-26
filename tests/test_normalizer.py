@@ -118,13 +118,19 @@ def test_normalize_limits_repetition_marks() -> None:
 @pytest.mark.parametrize(
     "text",
     [
-        # NOTE: この2つは見た目は同じだけど、中は異なるので注意!!!!!
-        pytest.param(unicodedata.normalize("NFD", "ディスプレイを買った")),
-        pytest.param(unicodedata.normalize("NFC", "ディスプレイを買った")),
+        # NOTE: この2つは見た目は同じでも、中身は異なるので注意。
+        pytest.param(
+            "\u30c6\u3099\u30a3\u30b9\u30d5\u309a\u30ec\u30a4\u3092\u8cb7\u3063\u305f",
+            id="NFD_Mac形式_確定",
+        ),
+        pytest.param(
+            "ディスプレイを買った",
+            id="NFC_標準形式_確定",
+        ),
     ],
 )
-def test_normalize_handles_nfd_mac_compatibility(text: str) -> None:
-    """Mac特有の濁点分離文字列が、ディスプレイを買った に正規化されることを確認する。"""
+def test_normalize_handles_unicode_normalization(text: str) -> None:
+    """NFD と NFC のどちらでも同じ結果に正規化されることを確認する。"""
     assert normalize(text) == "ディスプレイを買った"
 
 
