@@ -74,5 +74,5 @@ usr_cfg_mgr  # 非推奨: 略語を使用しているため、役割がわかり
 user_config_manager  # 推奨: 略語を避け、役割がわかりやすい
 ```
 
-- bool 値を扱う名前は、is_, has_, can_ などの接頭辞を推奨します。
+- bool 値を扱う名前は、is\_, has\_, can\_ などの接頭辞を推奨します。
   - 例: `is_empty`, `has_error`, `can_retry`
