@@ -1,6 +1,6 @@
 [project]
 name = "net-discourse-analysis"
-version = "0.1.0"
+version = "0.2.0"
 description = "Add your description here"
 authors = [{ name = "Keisuke Ishii" }]
 readme = "README.md"
