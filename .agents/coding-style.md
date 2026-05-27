@@ -61,6 +61,18 @@
 
 ### 命名規則
 
-命名は、慣習に従ってください。
-具体的には、動詞+名詞の形式で命名してください。
-例えば、`get_user_info`や`calculate_total_price`などの形式で命名してください。
+- 命名は、それぞれの役割の慣習に従ってください。
+- **関数・メソッド**: 原則として「動詞 + 名詞」の形式（例: `get_user_info`, `calculate_total_price`）
+- **変数・定数・クラス**: 名詞または形容詞 + 名詞の形式（例: `user_info`, `total_price`, `Comment`）
+- 定数は UPPER_SNAKE_CASE を使用してください。
+  - 例: `MAX_RETRY_COUNT`
+- 一般的でない略語は避けてください。
+- 名前だけで役割が推測できる命名を優先してください。
+
+```python
+usr_cfg_mgr  # 非推奨: 略語を使用しているため、役割がわかりにくい
+user_config_manager  # 推奨: 略語を避け、役割がわかりやすい
+```
+
+- bool 値を扱う名前は、is_, has_, can_ などの接頭辞を推奨します。
+  - 例: `is_empty`, `has_error`, `can_retry`
