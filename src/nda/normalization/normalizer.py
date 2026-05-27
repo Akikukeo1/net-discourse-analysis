@@ -70,10 +70,10 @@ def normalize(text: str) -> str:
     if not text or text.isspace():
         return ""
 
+    text = unicodedata.normalize("NFKC", text)
+
     text = _replace_urls(text)
     text = _replace_mentions(text)
-
-    text = unicodedata.normalize("NFKC", text)
 
     text = neologdn.normalize(text, tilde="normalize", repeat=3)
 
