@@ -30,7 +30,7 @@ def test_normalize_validates_input_type(invalid_value: object) -> None:
     """文字列以外の入力に対して TypeError を送出することを確認する。"""
     with pytest.raises(TypeError):
         # HACK: cast で型を偽造するのは冗長なので、チェッカーを黙らせる
-        normalize(invalid_value)  # type: ignore # noqa: PGH003
+        normalize(invalid_value)  # type: ignore  # noqa: PGH003
 
 
 @pytest.mark.parametrize(
