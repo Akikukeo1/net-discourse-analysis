@@ -11,7 +11,7 @@
 
 1. `sample_and_save(...)` で JSONL を生成
 2. JSONL を読み込む
-3. 各レコードの `comment.text` に `normalize_safe` または `normalize_analysis` を適用
+3. 各レコードの `comment.text` に `normalize` を適用
 """
 
 from __future__ import annotations
@@ -141,7 +141,7 @@ def iter_samples(video_url: str, limit: int = 200) -> Iterable[SampleRecord]:
 
     この関数は採取とラベル付けのみを行い、`comment.text` は未正規化の生テキストを保持する。
     正規化が必要な場合は、保存後または呼び出し側で
-    `nda.normalization.normalizer.normalize_safe` などを適用する。
+    `nda.normalization.normalizer.normalize` を適用する。
     """
     video_id = _extract_video_id(video_url)
     found_by_label: dict[NormalizationLabel, SampleSource | None] = {
@@ -192,7 +192,7 @@ def sample_and_save(video_url: str, out_path: str | Path | None = None, limit: i
     保存されるフィールドはデータポリシーに合わせる。
 
     NOTE: この関数は正規化処理を行わない。ここで保存される `comment.text` は採取時点の
-    テキストであり、正規化は保存後に `nda.normalization.normalizer` で実行する。
+    テキストであり、正規化は保存後に `nda.normalization.normalizer.normalize` で実行する。
     """
     if out_path is None:
         out_path = DATA_DIR / "safe_normalized_samples.jsonl"

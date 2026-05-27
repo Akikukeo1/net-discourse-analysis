@@ -3,107 +3,79 @@ from __future__ import annotations
 import re
 import unicodedata
 from re import Pattern
+from typing import Final
+
+import neologdn  # HACK: 誤検知を黙らせる  # type: ignore  # noqa: PGH003
+
+NORMALIZATION_VERSION: Final[str] = "0.1"
+
+URL_TOKEN: Final[str] = "[URL]"
+MENTION_TOKEN: Final[str] = "[MENTION]"
+
+TRAILING_PUNCTUATION: Final[str] = (
+    "。、，,"  # 読点・カンマ  # noqa RUF001
+    "!！?？"  # 感嘆符・疑問符  # noqa RUF001
+    ":：;；"  # コロン・セミコロン  # noqa RUF001
+    ")}]）】』」"  # 閉じ括弧系  # noqa RUF001
+)
 
 URL_PATTERN: Pattern[str] = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
-# NOTE: 日本語を含むメンション/ハッシュタグを想定し、空白や区切り記号で終了するようにする
-# CHECK: メンションの境界は email 誤爆を避けるため、負の後読みで十分か確認する
-MENTION_PATTERN: Pattern[str] = re.compile(r"(?<!\w)@[^\s@#]+", re.UNICODE)
-# CHECK: ハッシュタグの境界と末尾句読点の扱いが分析用途で十分か確認する
-HASHTAG_PATTERN: Pattern[str] = re.compile(r"(?<!\w)#[^\s#]+", re.UNICODE)
+
+# FIXME: youtube.pyのリファクタまで、一時的にこの2つを追加しておく。
+# FIXME: 絶対に消す!!!!!
 CONTROL_PATTERN: Pattern[str] = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]")
+ZERO_WIDTH: tuple[str, ...] = ("\u200b", "\u200c", "\u200d", "\ufeff")
+
+# NOTE: 日本語を含むメンション/ハッシュタグを想定し、空白や区切り記号で終了するようにする
+# NOTE: メンションの境界は email 誤爆を避けるため、負の後読みで十分か確認する
+MENTION_PATTERN: Pattern[str] = re.compile(r"(?<!\w)@[^\s@#()\[\]\{\}（）［］｛｝、，,]+", re.UNICODE)  # noqa RUF001
 WHITESPACE_PATTERN: Pattern[str] = re.compile(r"\s+", re.UNICODE)
-ZERO_WIDTH = "\u200b\u200c\u200d\ufeff"
-URL_TOKEN = "[URL]"
-MENTION_TOKEN = "[MENTION]"
-HASHTAG_TOKEN = "[HASHTAG]"
-NORMALIZATION_VERSION = "nfkc-v1.1"
-
-# NOTE: 丸付き数字や括弧付き数字は削除せず、NFKC正規化によってASCII互換文字に変換することを優先します。
-# 正規化の前に囲み英数字を除去しないでください。
-# テストの既存の期待値に合わせるため、右シングルクォート U+2019 は削除しますが、左シングルクォートは保持します。
-BAD_CHARS = "\u2019"
-
-# TODO: 互換文字の扱いを用途別に切り替える設定を追加したい
-# CHECK: NFKC により記号や全角英数が正規化されるため、分析用途で期待通りか確認する
-# TODO: preserve_newlines=False の切り替えがあると、改行由来の感情強度分析で扱いやすい
-
-
-def _remove_zero_width(text: str) -> str:
-    for ch in ZERO_WIDTH:
-        text = text.replace(ch, "")
-    return text
+INVISIBLE_PATTERN: Pattern[str] = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\u200b\u200c\u200d\ufeff]")
 
 
 def _normalize_whitespace(text: str) -> str:
     return WHITESPACE_PATTERN.sub(" ", text).strip()
 
 
-def _remove_control_chars(text: str) -> str:
-    return CONTROL_PATTERN.sub("", text)
+def _remove_invisible_chars(text: str) -> str:
+    return INVISIBLE_PATTERN.sub("", text)
 
 
-def _normalize_base(text: str) -> str:
-    # Use NFKC to convert enclosed/compatibility characters (e.g. 丸付き数字) to
-    # their ASCII equivalents where appropriate.
-    # 丸付き数字などの互換文字を、必要に応じてNFKCでASCII互換文字に変換します。
+def _extract_trailing_punctuation(token: str) -> str:
+    """トークン末尾の句読点部分『のみ』を抽出して返す。"""
+    trimmed = token.rstrip(TRAILING_PUNCTUATION)
+    return token[len(trimmed) :]
+
+
+def _mention_replacer(match: re.Match[str]) -> str:
+    """MENTION_PATTERN にマッチした文字列から末尾の句読点のみを抽出し、置換トークンと結合する。"""
+    suffix = _extract_trailing_punctuation(match.group(0))
+    return f"{MENTION_TOKEN}{suffix}"
+
+
+def _replace_urls(text: str) -> str:
+    return URL_PATTERN.sub(URL_TOKEN, text)
+
+
+def _replace_mentions(text: str) -> str:
+    """テキスト内のメンションを [MENTION] に置換する(末尾の句読点は維持)。"""
+    return MENTION_PATTERN.sub(_mention_replacer, text)
+
+
+def normalize(text: str) -> str:
+    """正規化を行う。"""
+    if not isinstance(text, str):
+        raise TypeError(f"text は str 型である必要があります。 got: {type(text).__name__}")
+
+    if not text or text.isspace():
+        return ""
+
     text = unicodedata.normalize("NFKC", text)
-    text = _remove_zero_width(text)
-    # 正規化後、不要な記号を除去します。
-    return text.translate(str.maketrans("", "", BAD_CHARS))
 
+    text = _replace_urls(text)
+    text = _replace_mentions(text)
 
-def _strip_trailing_punctuation(token: str) -> tuple[str, str]:
-    """トークン末尾の句読点を分離する。"""
-    trailing_punctuation = "。、，,.!！?？:：;；)]}）】』」"  # noqa RUF001
-    trimmed = token.rstrip(trailing_punctuation)
-    return trimmed, token[len(trimmed) :]
+    text = neologdn.normalize(text, tilde="normalize", repeat=3)
 
-
-def _apply_placeholder_replacements(text: str, *, replace_hashtag: bool = False) -> str:
-    """URL とメンション/ハッシュタグをプレースホルダへ置換する。"""
-    text = URL_PATTERN.sub(URL_TOKEN, text)
-
-    def replace_mention(match: re.Match[str]) -> str:
-        _, suffix = _strip_trailing_punctuation(match.group(0))
-        return f"{MENTION_TOKEN}{suffix}"
-
-    def replace_hashtag_token(match: re.Match[str]) -> str:
-        body, suffix = _strip_trailing_punctuation(match.group(0))
-        if replace_hashtag:
-            return f"{HASHTAG_TOKEN}{suffix}"
-        return f"{body}{suffix}"
-
-    text = MENTION_PATTERN.sub(replace_mention, text)
-    return HASHTAG_PATTERN.sub(replace_hashtag_token, text)
-
-
-def normalize_safe(text: str) -> str:
-    """安全な正規化を行う。
-
-    - Unicode 正規化(NFKC)
-    - ゼロ幅文字の削除
-    - 制御文字の削除
-    - 前後の空白除去
-    - 連続空白の正規化
-    """
-    if not text:
-        return text
-
-    text = _normalize_base(text)
-    return _normalize_whitespace(text)
-
-
-def normalize_analysis(text: str, *, replace_hashtag: bool = False) -> str:
-    """分析用に正規化する。
-
-    - `normalize_safe` 相当の正規化を行う
-    - URL を [URL] に置換
-    - メンションを [MENTION] に置換
-    - ハッシュタグを必要に応じて [HASHTAG] に置換
-    """
-    if not text:
-        return text
-
-    text = _normalize_base(text)
-    text = _apply_placeholder_replacements(text, replace_hashtag=replace_hashtag)
+    text = _remove_invisible_chars(text)
     return _normalize_whitespace(text)
