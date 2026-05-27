@@ -5,7 +5,7 @@ import unicodedata
 from re import Pattern
 from typing import Final
 
-import neologdn  # HACK: 誤検知を黙らせる # type: ignore # noqa: PGH003
+import neologdn  # HACK: 誤検知を黙らせる  # type: ignore  # noqa: PGH003
 
 NORMALIZATION_VERSION: Final[str] = "0.1"
 
