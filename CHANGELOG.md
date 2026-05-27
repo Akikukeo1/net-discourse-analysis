@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v0.3.0 (2026-05-27)
+
+### Features
+
+- Update coding-style.md ([#51](https://github.com/Akikukeo1/net-discourse-analysis/pull/51),
+  [`a012d8b`](https://github.com/Akikukeo1/net-discourse-analysis/commit/a012d8bc92cccc1cdae699c18694fd1d33af7466))
+
+
 ## v0.2.0 (2026-05-27)
 
 ### Features
@@ -17,7 +25,6 @@
 
 - Version Update ([#49](https://github.com/Akikukeo1/net-discourse-analysis/pull/49),
   [`574cea3`](https://github.com/Akikukeo1/net-discourse-analysis/commit/574cea36762158e066a2803056b5e6bc2f71837f))
-
 
 ## v0.1.0 (2026-05-23)
 
