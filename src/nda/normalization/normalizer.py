@@ -5,7 +5,7 @@ import unicodedata
 from re import Pattern
 from typing import Final
 
-import neologdn  # HACK: 誤検知を黙らせる  # type: ignore  # noqa: PGH003
+import neologdn  # HACK: 誤検知を黙らせる  # type: ignore  # ruff: ignore[blanket-type-ignore]
 
 NORMALIZATION_VERSION: Final[str] = "0.1"
 
@@ -13,10 +13,10 @@ URL_TOKEN: Final[str] = "[URL]"
 MENTION_TOKEN: Final[str] = "[MENTION]"
 
 TRAILING_PUNCTUATION: Final[str] = (
-    "。、，,"  # 読点・カンマ  # noqa RUF001
-    "!！?？"  # 感嘆符・疑問符  # noqa RUF001
-    ":：;；"  # コロン・セミコロン  # noqa RUF001
-    ")}]）】』」"  # 閉じ括弧系  # noqa RUF001
+    "。、，,"  # 読点・カンマ  # ruff: ignore[ambiguous-unicode-character-string] RUF001
+    "!！?？"  # 感嘆符・疑問符  # ruff: ignore[ambiguous-unicode-character-string] RUF001
+    ":：;；"  # コロン・セミコロン  # ruff: ignore[ambiguous-unicode-character-string] RUF001
+    ")}]）】』」"  # 閉じ括弧系  # ruff: ignore[ambiguous-unicode-character-string] RUF001
 )
 
 URL_PATTERN: Pattern[str] = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
@@ -28,7 +28,7 @@ ZERO_WIDTH: tuple[str, ...] = ("\u200b", "\u200c", "\u200d", "\ufeff")
 
 # NOTE: 日本語を含むメンション/ハッシュタグを想定し、空白や区切り記号で終了するようにする
 # NOTE: メンションの境界は email 誤爆を避けるため、負の後読みで十分か確認する
-MENTION_PATTERN: Pattern[str] = re.compile(r"(?<!\w)@[^\s@#()\[\]\{\}（）［］｛｝、，,]+", re.UNICODE)  # noqa RUF001
+MENTION_PATTERN: Pattern[str] = re.compile(r"(?<!\w)@[^\s@#()\[\]\{\}（）［］｛｝、，,]+", re.UNICODE)  # ruff: ignore[ambiguous-unicode-character-string] RUF001
 WHITESPACE_PATTERN: Pattern[str] = re.compile(r"\s+", re.UNICODE)
 INVISIBLE_PATTERN: Pattern[str] = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\u200b\u200c\u200d\ufeff]")
 
